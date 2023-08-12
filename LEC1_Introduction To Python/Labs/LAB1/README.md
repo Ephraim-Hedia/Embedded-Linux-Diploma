@@ -1,6 +1,6 @@
 This Lab To Know about Your Computer Using Python Script<br/>
 and if You Want to Know More About This Topic You can Open This Link <br/>
-https://pypi.org/project/psutil/ 
+https://pypi.org/project/psutil/         <br/>
 and This Command to install psutil module <br/>
 **pip install psutil**
 
