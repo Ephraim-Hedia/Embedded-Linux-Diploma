@@ -2,13 +2,14 @@
 ### This repo contains Tasks for Team C1 at The Embedded Linux Diploma
 #### instructor : Moatasem Elsayed 
 ### Team Names 
+
 ```
 - Guirguis Hedia Henan              
-- Rashed Elsayed                
-- Abdullah Ezzat
-- Ahmed Waleed
-- Eslam
-- Randa
-- Ahmed Osama
-- 
+- Ahmed Kamel zaky                
+- Ahmed osamaa Abdelkader
+- Ahmed Wailed Ahmed
+- eslam mostafa mohamed        ||   eslammostafa1/
+- Abdullah Ezzat Abdesatar Mohaned
+- Rashed Wahdan
+- Randa Gamal
 ```
