@@ -5,12 +5,12 @@
 
  
 ```
-- Guirguis Hedia Henan: https://github.com/Ephraim-Hedia/Embedded_Linux_Diploma_Team_C1	              
+- Guirguis Hedia Henan:                      https://github.com/Ephraim-Hedia/Embedded_Linux_Diploma_Team_C1	              
 - Ahmed Kamel zaky                
-- Ahmed osamaa Abdelkader
-- Ahmed Wailed Ahmed: https://github.com/AhmedWaleedAhmed/Embedded-Linux-Tasks
+- Ahmed osamaa Abdelkader                    https://github.com/ahmed32004/embedded_linux_diploma_team_c1
+- Ahmed Wailed Ahmed:                        https://github.com/AhmedWaleedAhmed/Embedded-Linux-Tasks
 - eslam mostafa mohamed
-- Abdullah Ezzat Abdesatar Mohaned: https://github.com/abdulezzat/embedded-linux
+- Abdullah Ezzat Abdesatar Mohaned:          https://github.com/abdulezzat/embedded-linux
 - Rashed Wahdan
 - Randa Gamal
 ```
