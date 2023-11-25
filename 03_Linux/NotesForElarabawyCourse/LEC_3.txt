@@ -1,0 +1,145 @@
+LEC3 : Basic Concepts & Commands 
+
+Files & Filenames :
+	- Filenames can use any char
+		EX: abc??##.a1
+	- Spaces are accepted 
+	- File Name are sensitive Case 
+	- File names starting with a dot are hidden files
+		EX: .bashrc .profile 
+	- No Concept of file extension , the dot is just another char 
+		EX: result.yesterday
+
+Paths :
+	- Directory names Separated by Slashes 
+	- Can be absolute or relative 
+		Absolute :
+			EX :	/home/guirguis/abcd
+				~/abcd
+				~ means /home/guirguis (home directory of current user)
+		Relative :
+			Depends On Where you are in the tree
+			./my-project/progress-reports
+
+Commands :
+	- General form of Commands :
+		<command> [options][arguments]
+		Ex : 	ls , pwd , cd 
+	
+	-The Options are normally optional 
+		the usually start with - or --
+		'-' used with the short name for the option 
+		Ex : 
+			ls -a 
+			ls --all
+
+
+	-if we want to use multiple options Sometimes we join options or Keep them separate
+		Ex : 
+			ls -a -R
+			ls -aR
+			ls --all --recursive 
+		Options are case sensitive
+	
+	- arguments
+		Ex :
+			rm 	-rf 	./project-data
+			command options argument
+
+Basic Command :
+	- ls 
+	- tree
+	- pwd 
+	- cd 
+	- mkdir
+	- cp 
+	- mv
+	- rm 
+	- clear
+	
+Listing Files :
+	- ls 
+	- ls -a (show me all files including hidding files )
+	- ls -l (List with long format)
+		(file Type - Permission - # of Hard Links - Owners - filesize - Last of Modify Time - File name)
+	- ls -t (timestamp : sort based on timestamp)
+	- ls -S (Size : sort based on file size )
+	- ls -r (reverse : make the sort in reverse order)
+	- ls -d (directores : Only show directores)
+	- ls -R (Recursive : list files inside subdirectories)
+	- ls <dir> 	(List the contents of the mentioned directory)
+	- ls <file> 	(List the mentioned)
+	- The min Size for Directery Size is 4k 
+	
+
+tree command :
+	- tree [options] [dir or file ]
+	- tree -a (Show all files ; including the hidden ones)
+	- tree -d (Only Show the directories )
+	- tree <dir> (show the tree starting from a different point)
+
+pwd command :
+	-pwd (Display Current Directory)  
+
+cd Command :
+	- cd [destination]
+		Ex : 	cd /usr/local	(absolute)
+			cd /usr/local/bin
+			cd ./bin	(relative)
+			cd bin 
+			cd /usr/etc
+			cd ../../etc
+			cd ../../../home/biol1
+			cd /home/biol1
+			cd ~
+			cd 
+			cd ~user_name
+			cd - 		(Go to previous Directory)
+			cd ..   	(Go to Parent Directory)
+			
+mkdir Command :
+	- mkdir documents 
+	- mkdir /home/tom/documents
+	- mkdir ~/documents
+	- mkdir documents/text
+	- mkdir -p documents/text	(allow to bulid intermediate folders if needed)
+
+cp Command :	
+	cp <existing file or dir> <new filename & destination>
+	Ex : 
+		cp ~/books/science.doc ~/school/science.doc
+		cp ~/books/science.doc ~/school/
+		cp ~/school ~/patrick/ (Wrong Bill Can't access of patrick Location)
+		sudo cp -r ~/school ~/patrick/	(must Write -r)
+		cp file1 file2
+		cp file1 ../projects/
+		cp -r folder1 ../projects/
+		cp -r folder1 ../projects/folder2 (Change the name of the folder and copy it in another location)
+		cp /etc/passwd .	(Copy file to here)
+		
+mv Command :
+	Ex : 
+		mv ~/books/science.doc ~/school/science.doc	
+		mv ~/books/science.doc ~/school/
+		...
+		mv file1 file2 (rename file1 to file2)
+
+rm Command :
+	Ex : 
+		cd /usr/local/sbin 
+		rm prog1
+		rm ../etc/file.cfg
+		cd ../bin 
+		rm prog2 prog3
+		cd /usr/bin/utils
+		rm /usr/bin/utils	(Wrong)
+		cd - 
+		rm -r /usr/bin/utils
+		rm -i file1 file2	(ask me before deleting)
+		rm -f file1 file2 	(force to Delete)
+		NOTES :
+			- to remove directories you need alwayes to use -r 
+			- you can not remove your current directory (or any of its parents)
+			
+			
+			

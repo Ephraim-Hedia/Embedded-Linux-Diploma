@@ -1,0 +1,33 @@
+LEC 1 Notes for Elarabawy :
+
+Access of Linux :
+	- GUI 
+	- Using Command Line Interface
+
+Why Learn About CLI ?
+	- More Control 
+	- Faster , one Command can do the effect of serveral menus 
+	- Enable Automation and Scripting
+	- We are Going to work with embedded systems , CLI is all what we have 
+	
+Course Contents :
+	- UnWrapping Linux 
+	- Basic Concepts and Commands 
+	- Seeking Help 
+	- Learning about the Shell 
+	- Composite Commands 
+	- Basic Text Handling 
+	- Environment Variables 
+	- Searching for Files 
+	- Archiving & Compression 
+	- Users & Permissions
+	- Process Management 
+	- Sending Signals 
+	- Package Management 
+	- Regular Expressions 
+	- Networking 
+	- FileSystems 
+
+Course Logistics :
+	- Hands On Course 
+

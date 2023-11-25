@@ -1,0 +1,46 @@
+LEC2 For Arabawy Course :
+-------------------------
+Unwapping Linux :
+
+root /
+	bin/ 
+	boot/
+	dev/
+	etc/
+	home/
+		user1
+		user2
+		user3
+	lib/
+	mnt/
+	opt/
+	proc/
+	root/
+	sbin/
+	temp/
+	usr/
+	var/
+
+- Choose the Mounting Point	
+	- i have primary partition and i can mount disk2 to the tree
+	- We Have a Single Tree
+	- The head of the tree called the root /
+	
+File System Folder :
+
+Home -> have the Users of the System , and i can see Tree for every User
+root -> I Can't Open the Folder 
+boot -> The Folder have all of the Files we need to boot the System Like Grub Bootloader 
+bin  -> Have alot of Binarys  
+sbin -> // 
+lib  -> Libarays
+etc  -> all of the Apps Have Configuration File in This Folder 
+	passwd -> has list to all User in the SYstem and important information for each user
+dev  -> all Devices has File in this Folder 
+mnt  -> Mounting Point to all the Devices 
+media-> Mounting Point to all the Devices 
+opt  -> Optional Software ; Extra and Third Party of Sortware r
+usr  -> space memory to share for all users 
+var  -> variables Files Like Logs 
+sys  -> Virtual File System , Mapping to the Kernel
+proc -> Virtual File System , Mapping to the Kernel 

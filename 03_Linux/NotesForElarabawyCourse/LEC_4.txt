@@ -1,0 +1,61 @@
+LEC_4 : Using Wild Cards 
+
+sometimes you will need to execute a command on a group of files instead of a single file 
+	Ex :
+		- You want to delete all log files 
+		- You want to list all image files 
+		- you wnat to copy old files (ending with .old) to a different place 
+	The solution for that is to use Wild Cards 
+	
+======================================================================================
+The * Wild Card :
+	- The * can replace any set of characters (including none) in the file/directory name
+		Ex : 
+			rm *.php
+			rm p* 		(remove all files begins with p)(this command will not remove any directory)
+			rm *.*htm*
+			rm -r *.*	(remove all files and directories with . )
+			rm -r * 	(remove Everything)
+The ? Wild Card 
+	- The ? wild card stands for any single character
+	Ex :
+		rm 40?.shtml
+		rm ?0?.shtml		
+======================================================================================
+
+[<char>] and [!<char>]
+	[ars] 	: Stands for a Single character from the list a,r,s
+	[!ars]	: Stands for any Single character except for the list a,r,s
+	[2-5]   : Stands for a Single char from the range 2 to 5 
+	[!2-5]  : Stands for any Single char exepct for the list 2 to 5
+	[a-l]   : stands for a Single char from range of 'a' to 'l'
+	[1-37-9] :Stands for 1,2,3,7,8,9
+	[a-chk]  :Stands for a,b,c,h,k
+	Ex : 	
+		rm [ab]bc.txt 
+		rm [!bc]bc.txt
+		ls results-[0-9][0-9].log
+		
+		
+[[:<Class Name>:]] :
+	[[:alnum:]]	--> Alpha Numeric char (a-z , A-Z , 0-9)
+	[[:alpha:]]	--> Alphabets (a-z,A-Z)		
+	[[:digit:]] 	--> Digits (0-9)
+	[[:lower:]]	--> Lower Case Char
+	[[:upper:]]	--> Upper Case Char
+
+Use of Curly Brackets {} :
+	rm {*.log , *.txt}
+	cp (*.pdf,*.doc) ~/documents/
+	Notes : 
+	rm *.log *.txt
+	cp *.pdf *.doc ~/documents/
+	
+tips : 
+	- use ls before rm 
+	- use -i with rm  
+
+Escape Sequence \ 
+	
+
+
