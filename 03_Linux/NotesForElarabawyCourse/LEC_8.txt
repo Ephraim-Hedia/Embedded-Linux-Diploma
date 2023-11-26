@@ -1,0 +1,199 @@
+LEC8 : Composite Commands
+
+
+Linux Command Philosophy :
+	- Linux Commands follows the Following philosophy :
+		- Create small , portable , specialized programs that perform one task well 
+		- make this program capable of receiving input from , and redirect output to , other programs 
+	- This way , Linux Commands are link LEGO Blocks
+	- this philosophy has resulted in creation of a lot of small but very powerful when joined together
+
+
+Composite Commands :
+	we can build Composite Commands through the following :
+		- Sequential Commands 
+		- Conditional Commands
+		- Command Loops 
+		- Input / Output Redirection
+		- Pipes
+		- Command Ardument Expansion
+		- Command Argument Quoting
+		
+1- Sequential Command 
+	-Indepentdent input output
+	$ <first Command> ; <Second Command> ; <third Command> 
+	$ echo "One";sleep 10;echo "Two"
+	- Using sequential commands is useful when the first command takes long time to execute and don't want to wait until it is complete
+	$ make ; sudo make install
+	NOTE : 
+		The Sequential Commands just run after each other , they have independent input & output
+
+2- Conditional Commands :
+	- Oring ("||")
+		- second command will only execute if the first returns failure
+			Ex : 	
+				$ cat <filename> || echo "File Not Found"
+		-Used in Error Handling 
+		
+	- ANDing ("&&")
+		- Second Command will only execute if the First Returns Successfully
+			Ex : 
+				$ mkdir dir1 && cd dir1
+	
+	
+	
+	
+3- Command Loops :
+	$for file in *.txt
+	> do
+	> mv -v $file $file.old	
+	> done
+	
+	
+	
+4- I/O Redirection
+	$ <Command> > file 	(Redirect output to file ; OverWrite)
+	$ <Command> >> file	(Redirect output to file ; Append)
+	Ex : 
+		$ echo "Hello World"			(OUTPUT goes to the screen)
+		$ echo "Hello World" >	greeting.txt	(OUTPUT goes to the file , OverWrite)
+		$ echo "Hello World" >>	greeting.txt	(OUTPUT goes to the file , append)
+		$ cat file1 file2 > combined-file.txt
+
+		$ echo "Hello World" > greeting.txt	(OUTPUT goes to the file ,OverWrite)
+		$ echo "Hello World" >> greeting.txt	(OUTPUT goes to the file ,Append)
+		$ ls -al /usr/bin >>file-listing.txt	(OUTPUT goes to the file ,Append)
+	
+	Note :
+		1. Error Messages Still go to the Screen 
+		2. ">" Stands for (and can be replaced by) "1>" which means Redirect Output Stream			
+	
+	$ <Command> 2> file 		(Redirect Error to file ; Overwrite)
+	$ <Command> 2>> file 		(Redirect Error to file ; Append)	
+	Ex :
+		$ make 		(Both Output and Error Messages go to Screen)
+		$ make 2> log 	(Output goes to stdout , Error Message go to file , Overwrite)
+		$ make 2>> log  (Output goes to stdout , Error Message go to file , Append)
+		
+Both Output $ Error Redirection :
+	- OUtput and Error go to Different Files :
+		$<Command> >file1 2> file2	(OUTPUT to file1 , error to file2) 	 
+		$<Command> >>file1 2>>file2	(OUTPUT to file1 , error to file2)
+		
+	- Both Output and Error go to the same file : 
+		$<Command> >file 2>&1	(Both to file)
+		$<Command> >>file 2>>&1 (Both to file)
+		
+	- Short Version of the same Command
+		$<command> &>file	(Both to file)
+		$<command> &>>file	(Both to file)
+		
+		
+Standard Input Redirection :
+	$ <command> <file	(input to the command is read from the file)
+	Ex :
+		$ wc -l < log-file.log	(world Count , l stand for line)
+		$ sort < log-file > sorted-log-file
+		$ mail ceo@company.com < resume
+		$ spell < report.txt > error.log
+
+Common Devices For Redirection 
+	/dev/stdout 	: Standartd output device 
+	/dev/stderr	: Standartd error device 
+	/dev/stdin 	: Standartd input device 
+	/dev/null	: This Device is useful for being a data sink . this is useful when we want to discard the command output
+	/dev/zero	: This device is useful as an input device to generate and infinite stream of zeros
+	/dev/random 	: This Device is useful as an input device to generate random bytes . it may block
+	/dev/unrandom 	: This Device is useful as an input device to generate quasi-random bytes . it is non blocking
+	/dev/full	: This Device is used as an output device to simulate a full file . it is used for testing purposes
+	
+5. USING PIPES :
+	- What is a Pipe ?
+		- A pipe is a mechanism in Linux Kernel that is used to enable one process to send information to the other process
+		- This is called IPC (Inter process Communication)
+		- A Pipe is a unidirectional Mechanism , so if you need data to flow in both direction ,you will need two pipes 
+		(One for each direction)
+	- Using Pipes
+		$ command-1 | command-2 (Output of command-1 is the input of command-2)
+		- Pipes in Linux are a method for Communication between different processes (Inter Process Communication)
+		- On the Command Line Interface , we can run two Commands and connect them with a pipe , so output of cone command
+		  feeds in the input of another one
+		- Note that every command runs in a sub-shell of the shell issuing it (Child Shell)
+	- <command1> | <command2> | <command3>
+		-Ex :
+			$ cat log-file.log | grep "Error"
+			$ man gzip | grep -i "compress"	(-i case insensetive) 	
+			$ cat log-file1.log log-file2.log | grep -i "error"
+			$ cat name-list.txt | sort
+			$ cat * | grep -i "error" | grep -v "severe" | sort > file.log
+			$ cat resume | mail bill-gates@microsoft.com
+			
+	- More with Pipes [tee Command]
+		<command> | tee <List of Sinks>			(Including stdout) 
+		$ make | tee make.out.txt			(output to the screen and the file)
+		$ make | tee -a make.out.txt			(same , but uses append mode)
+		$ date | tee file1 file2 file3 file4		(date is send to the 4 files & screen)
+		$ make | tee make.out.txt >> file2		(output goes to make.out.txt and appends file2)
+		$ make | tee make.out | grep "error"
+		
+	- More with Pipes [yes command]
+		$ yes <string> | <command>
+			- The command "yes" passes a string to the command prompt
+			- the default string is 'Y'
+		Example : 
+			$ yes | rm -r ~/project-folder/
+			$ yes " " | make config
+			
+6. Command Argument Expansion
+	Wild Card Expansion (*,?,...) :
+	Examples :
+		$ cp *../project/
+		$ cat * > log-files
+		$ echo * 
+	Tilde Expansion [~] :
+		$echo ~ (/home/guirguis)
+	
+	Parameter Expansion :
+		$ echo $PATH
+		$ echo ${PATH}				
+		$ MY_NAME = Guirguis
+		$ echo "My Name is $MY_NAME"
+	
+	Arithmatic Expansion :	
+		$echo $((5+6))
+		$echo $((((5*2))**3))
+	Brace Expansion {}
+		$echo abc-{A,B,C}def
+		$echo a{A{1,2},B{3,4}}b --> aA1b , aA2b , aB3b , aB4b
+		$mkdir a{A,B}
+	similarly , you can use the expansions
+		{1..5}
+		{A..Z}		
+		
+7. Command Argument Quoting :
+	Double Quotes :
+		-Protect Strings (spaces , wild cards , tilde , ...)
+			$ echo "*" 		(Print *)
+			$ echo *		(Print Every Thing)
+		
+		- Protect from command substitution 
+			echo ls 		(Print ls)
+		- Protect from Arithmatic Expansion 
+			$ echo "$((5+6))"	(Print $((5+6)))
+		- Does not stop variable retrieval
+			$ MY_NAME = Guirguis
+			$ echo "My Name is $MY_NAME"	(Print My Name is Guirguis)
+	Single Quotes :
+		- Similar to double except that is als protects variable retieval
+		Examples :
+			$echo '$PATH'	(Print $PATH) 
+			$ MY_NAME = Guirguis
+			$ echo "My Name is $MY_NAME"	(Print My Name is MY_NAME)
+			
+	back Quotes [``]:	
+		back quotes are used to do commands inside commands/strings
+		Examples :
+			$cd /lib/modules/`uname -r`	($cd /lib/modules/6.2.0-36-generic)	
+			$pushd `pwd`
+			$ touch `date +%m-%d-%Y`
+		

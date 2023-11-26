@@ -1,0 +1,84 @@
+LEC_6 : Seeking Help
+
+Command 	Effect 
+man		Read Manual Pages 
+whatis		Search man page titles by keywords
+apropos		Search the man pages by keywords
+info		Read inof Pages
+<command> -h
+<command> --help	
+
+
+----------------------------------
+man Command :
+	Ex : man ls 
+
+Where are the Manual Pages ?
+	- the 'man' command reads from the manual pages stored in your distribution 
+	- the location of these pages may differ slightly based on the distribution 
+	- use the command 'manpath' to know the location of the man pages on you manchine 
+	- This command identify the location of the man pages based on the configuration file "/etc/manpath.cfg"
+	- sometimes we will have an Environment variable MANPATH for that purpose too 
+		echo $MANPATH
+	- Typically they are located in /usr/share/man/
+
+The Manual Sections :
+	- the man pages are classified into multiple sections with numbers :
+		1- for Commands 
+		2- for system calls 
+		3- C Library Functions 
+		4- Sepcial filenames 
+		5- file formats for linux files
+		6- games and things like screen savers
+		7- word processing packages & Misc
+		8- System administration commands
+		
+Selecting the Manual Section :
+	-We can decide which section we want to show from the man page 
+		man <n> <name>
+		Ex : 	man 1 passwd
+			man 5 passwd 	(/etc/passwd)
+			msn passwd (Default is section 1 ; the command)
+	- To Learn more about the man command 
+		man man
+
+The 'whatis' Database :
+	- The 'whatis' database is a database containing a selected parts of the man pages :
+		- Title 
+		- Section Number 
+		- Name field
+	- This database  is used with the commands 		
+		- whatis
+		- apropos
+		
+whatis Command :
+	Search in Titles and then print 3 Sections :
+		Title , Section Number , Description (From Name field)
+	whatis ls --> ls(1)	-List directory Contents
+	
+apropos Command :
+	Search in all database not only title
+	Ex : 	apropos process 	(Searches for the commands dealing with process)
+		aoriois proce		(even a part of a word can be used)
+	
+	Nots , the same output can be achieved via :
+		man -k <keyword>
+		
+		
+info Command :
+	- info <Command> (Display the info pages on the command) 
+	- The GNU Commands will have both man pages and info pages :
+		- The info pages are usually more recent and are somewhat easier to use
+		- sometimes , the man pages refer to the info pages 
+
+Help From Withen : 
+	<Command> -h 
+	<Command> --help 
+
+
+
+
+
+
+
+

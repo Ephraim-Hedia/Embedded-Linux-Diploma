@@ -1,0 +1,167 @@
+LEC5 : File Handling Internals 
+
+File-System : 
+Storage Device (Hard Disk / Flash )
+	File-System Control Partition 
+		file system Meta-Data
+		file System Data (The larger Storage)
+		
+What is a File ?
+	- Data
+	- FileSystem Meta-Data
+		- inode (index Node)
+			- inode Number
+			- File Size 
+			- Owner
+			- Permissions 
+			- Date of Creation 
+			- Data of Modification
+			- Data Blocks 
+			- No File Name 
+			- No File Path  
+		
+	- A file is a set of bytes that represent some content (PDF , Excel , Binary Exe , ...)
+	- The file is stored in a partition (storage device) as a single data block or fragmented into a group of data blocks 
+	  (withen the same partition)	
+	
+	- The file system is responsible for managing the data blocks , and their representation to the user   
+	- For this Management , the fileSystem needs to maintain some extra info about the file which is called Meta-data 
+		- File Size 
+		- File Owner 
+		- File Permission 
+		- Data of Creation / last Modification 
+		- Pointers to the file content data blocks 
+		- etc ...
+	- This meta-data are stored in an "inode" structure 
+	- Note : The inode doesn't contain the file name or its Location
+	- This Mean that the file system maintains a table of inode structures (one structure per file)
+	- Each data node has a unique number across the filesystem (The inode Number)
+	- Directories are a special type of filse , accordingly , they are treated the same way 
+	
+SO , What about Filenames & Paths ?? 
+	- The inode structure doesn't have knowledge about the filename and Path
+	- instead , each file or directory has another structure named "dentry" , this structure maps a file/directory to its "inode"
+	- dentry has : Name , Child , Parent , inode Number which point to file Metadata which point to the data Block  
+	
+	Note ::::
+	The file content from 3 Parts : 
+		- dentry 
+		- inode 
+		- Data Block
+
+Linux Commands :
+	ls  Command :
+		ls -il --> List Files with inodes 
+	stat (Show File status info):
+		stat ./LEC2.txt
+	df (Show FileSystem Disk Space Usage)
+		df -i
+		NOTE :  File with Size = 0 , That Means The file Has Dentry and Inode but it hasn't Data Block 
+			Hard can be full if The data Block is full or if the inodes if full
+			
+File Operations :
+	Copying a File : 
+		If i want to Copy File , That mean i need a New dentry and new Inode with new data Blocks 
+	Renaming File :
+		I Don't Need a New Data Blocks / Inode , But i need to change the Name in the dentry Only 
+		So if i change the file Name , and i see Inode , i will see the Inode not changed 	 		
+	Moving File within same FS:
+		SO I need to Change the Dentry Totally
+	Moving a File (Between FSs) :
+		So i Create a New File System 
+		
+Linking Files :
+	I Need to Create A new dentry to point to inode (Hard Link)
+	HardLinks :
+		- the decision of not including the filename and path in the "inode"structure was to enable the use of hard links
+		- Hard Links were introduced from the early days of Unix 
+		- a hard Link 
+			- Not a new file 
+			- same file content 
+			- same inode 
+			- Just an additional "dentry" with a different filename/path , but with the same inode
+		- This is useful if we need to have the same file with two names , or in two locations 
+		- (ls -l) --> How me a number of Hard Links for each file
+		However , 
+			- Hard Links are not very common these days , they have some limitation : 
+				- Only applicable for files , not used for directories
+					After implementing it for directories , a security hole was found 
+				- Does not work across filesystems
+					we just link using the inode#
+	
+	Symbolic Links :
+		- A symbolic Link is introduced to fix the problems of Hard Links 
+		- A symbolic Link is not just a dentry Structure , it is a file with an inode structure 
+		- the inode structure 
+			- the type is set to 'l' for a symbolic Link 
+		TWO Types of implementation :
+			- Slow Symbolic Links :
+				The data block of the new file include the path of the file it is linking to 
+			- Fast Symbolic Links :
+				- A field in the inode points to the path and name of the file / directory it is pointing to 
+				- faster , no need to read the data block 
+				- not Possible if the path too long to fit in the inode structure 
+		- Science a symbolic link it has its own inode , with an obvious indication that it is a link 
+			- some commands is able to treat it differently 
+			- avoid the security hole in the hard links with linking directories
+		- Symbolic Links are like shortcuts in windows 
+		- You Can have a symbolic link to a file or a folder 
+
+Deleting Files & Links :
+	Hard Linkes :
+		if i delete one hard link , the file will not deleted because  there are another hard link point to the data
+		if i want to delete the file , i have to delete alls of hard links
+	Symbolic link :
+		if i delete the symbolic link , the file will not be deleted 
+		if i delete the file , the symbolic link will have broken Link
+
+Linux Commands :
+	ln command :
+		to Create Hard Link :
+			ln <file to link to > <link name & location>
+			Ex : ln file.log ~/log-files/a.log
+		
+		to create a Symbolic Link :
+			ln -s <file to link to> <link name & location>
+			EX : ln -s ~/file.log ~/log-files/a.log
+			
+			Important NOTE :
+				Always use absolute paths for the file to link to when creating symbolic links . Never use relative path
+		Quetions :
+		we agree that hard links are not allowed for directories 
+		Now doing a simple listing results in :
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

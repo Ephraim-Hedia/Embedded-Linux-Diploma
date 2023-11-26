@@ -1,0 +1,87 @@
+LEC7 : Simple Utilites 
+
+Advanced Navigation Commands :
+	pushd		To push Directory (save it for later) 
+	popd		To pull Directory (retrieve last pushed one)
+	dirs		To show the stack of pushed directories
+	
+pushd <directory path>
+popd
+dirs
+	linux Keeps a stack of directories
+
+what is a Stack ?
+
+-------------
+Example :
+	$ pushd /home/tom is equivalent to :
+		$ cd /home/tom + push the directory "/home/tom" to the stack 
+	$ popd is equivalent to :
+		Get the top path from the stack + cd <the selected path>
+		
+	$ dirs is equivalent to :
+		List the content of the directory stack 
+		
+-----------------------------------
+Simple Commands and Utilites 
+	$ echo 		Display a line of text
+	$ cat 		Display text files
+	$ date		Shows the date
+	$ cal 		Shows the calender
+	$ ncal		Shows the calender
+	$ bc 		Basic Calculator
+	$ hostname	Get the machine name
+	$ uname		Print the System information
+	$ uptime 	Get the System up-time
+	$ reboot 	Reboot the Machine (Must be root)
+	
+	
+echo Command :
+	$ echo <Text string to display>
+	$ echo $<variable Name>
+	Ex :
+		$ MY_NAME="Guirguis Heda"
+		$ echo My Name is $MY_NAME
+	to know more information about echo , you can use $ man echo	
+
+cat Command :
+	$ cat <file or files to display>
+	Ex :
+		$ cat file-1
+		$ cat file-1 file-2
+
+date Command :
+	$ date (Show Current data and time)
+	You Can Use $ man date   to determine the best format for you
+	$ date +%D		OUTPUT : 04/30/14
+	$ date +%F		OUTPUT : 2014-04-30
+	$ date +%j		OUTPUT : 120 (day of the year 001 .. 366)
+	$ date +%Y		OUTPUT : 2014
+	$ date +%m/%d/%Y	OUTPUT : 04/30/2014
+	$ date +%m-%d-%Y	OUTPUT : 04-30-2014
+
+Cal Command :
+	$ cal (Show the Calender for the Current Month)
+	$ cal 2014 
+ncal Command :
+	$ ncal
+		
+bc Command :
+	$ bc
+
+hostname Command :
+	$ hostname
+	$ sudo hostname <new hostname>
+
+uname Command :
+	$ uname -all
+
+uptime Command :
+	$uptime (print the system uptime and load)
+
+reboot Command :
+	sudo reboot 
+	
+		
+		
+	  
