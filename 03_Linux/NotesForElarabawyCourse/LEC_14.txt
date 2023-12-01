@@ -1,0 +1,334 @@
+LEC 14 : Users & Permissions 
+
+Multi-User System
+	- Unix was initially created to work with multiple users (Before personal computers were introduced)
+	- Linux inherits multi-user supprot from UNIX systems
+	- This resulted in strong support for multi-users in Linux 
+
+- Multi-User Support in linux :
+	- Multiple User can access the system
+		- Simultaneously	
+			- Using multiple physical terminals 
+			- Using multiple virtual terminals 
+			- Via a network connections (multiple users logged on to the same linux machine)
+			- A mix of all above
+			- at different time using the same interface
+	- Keep in mind , even if one user is using the linux system , he may still be using multi-User features since there be the root
+	  user as well
+
+	- So what does Linux need to do for multiple users :
+		- Enable each user to have his own work area for his private files 
+		- Enable each user to have his own environment settings 
+			- Environment variables such as search paths , ... 
+			- Aliases and shell functions 
+			- Configuration parameters 
+		- Protect each user files and resources from being manipulated by other users (unless the owner given permission for that)
+		- Establish a multiple-tiered permission system , so a user maybe able to read a file but able to modify it
+		- Enable multiple users to share some resources (such as files) with some level of permissions
+		- Protect system critical files from normal user accses
+	- Linux provides :
+		- Each user has his own directory (for his private files and directories) :
+			/home/tom/	or 	~/
+		- Each user has his own environment settings (per user startup scripts) :
+			~/.bashrc
+		- Each user can have his own resources
+			- Files 
+			- Directories 
+			- Scripts and Binaries
+			- Sockets
+			- Devices
+		- Remember all these resources will be reppresented in Linux by files
+
+Users and Groups :
+	- Each user is identified with his user-name and user-id (UID)
+	- Users can join different user groups
+	- Groups has group-name and group-id (GID)
+	- a user can ve a member of multiple groups
+		- he can be added to a group
+		- he can be removed from the group
+	- Each user has a primary group 
+		- Initially it is a special group created under his same name when the user is created 
+		- can be modified later
+
+Resources :
+	- When a user creates a system resource (such as a file , socket , ...) , the resource will be associated
+		- Owner ---> UID
+		- Owning Group --> User primary GID
+	- Each resource in Linux has knowledge of :
+		- Which user own it (UID)
+		- Which group it belongs to (GID)
+		- Permissions for its owner , group , and the rest of the world
+Permissions :
+	- Permissions are associated with system resources not with users
+	- This means that each system resource will have an owner , and a set of permission for its owner , and for non-owners
+	- There are 3 types of access rights 
+		- Read (r)
+		- Write (w) (change , move , delete)
+		- Execute (x)
+	- And Three levels of access levels
+		- User (u)
+		- Group (g)
+		- World , or other(o)
+		
+	- $ ls -l 		--> to Know the permissions
+	
+Files Types :
+	- 	(file)
+	d	(directory)
+	l	(symbolic link)
+	b	(block special file)
+	c	(character special file)
+	p	(named pipe special file)
+	s	(local socket special file)
+	
+Permissions in Binary 
+	- Another way to represent permissions is via binary bits 
+	- For Example :
+		rwx = 111 	in binary = 7
+		rw- = 110 	in binary = 6
+		r-x = 101	in binary = 5
+		r-- = 100	in binary = 4
+	- So to represent the User/Group/Other Permissions :
+		rwx rwx rwx = 111 111 111 = 777
+		rw- rw- rw- = 110 110 110 = 666
+		rwx --- --- = 111 000 000 = 700
+		
+Permissions of a file :
+	- to be able to read a file , you need 'r' permission
+	- to be able to write/modfiy a file , you need 'w' permission
+	- to be able to execute a binary or a script , you will need both 'r' and 'x' permission
+	- if you want to preserve the permission of a file during copying , use 
+		$ cp -p
+		
+		
+Permissions of a Diretory :
+	- A directory is a special type of file that contain meta information about its content (subdirectories and files)
+	-	Permission	Meaning
+		r		You can ls the directory
+		w		You can add files or remove files , rename files
+		x 		You can cd into the directory , or use the directory as an intermediate part in the path
+		
+		
+Super-User [root] :
+	- One user is the root user (Super-user) , this user can override all the permissions restrictions for all system resources
+	- in some Linux Distribution you can log in as root to have these rights 
+	- in Ubuntu , you can not log in as root , but you use sudo to issue a command as super user 
+		$ sudo vi /etc/crontab
+	- Note that not every user has the right to use sudo , need to edit the file /etc/sudoers to add users who can use it
+	
+- Managing Permissions :
+	- Linux provides a set of commands to manage permissions of files :
+		- You can chanage permissions of a file
+			- Need to have rights to access the file to be able to change its permissions
+			- You can change the owener of the file 
+			- You can change the owning group of a file
+			
+- Changing file Permissions :
+	- [chmod Command]
+		$ chmod <permission> <file or directory>
+		This sets the selected permissions to the chosen file or directory 
+			- Permissions can be set as relative to the current permissions
+				- '+' to add this permission and keep other permissions untouched
+				- '-' to remove this permission and keep other permissions untouched
+					$ chmod +x my-script
+					$ chmod u+w file1
+					$ chmod u-w file2
+					$ chmod go+r file1
+			- Permissions can be set as absolute value irrespective of the current settings 
+				- '=' to set the permissions and overwrite the old permissions
+					$ chmod a=x file3	(a for all 'ugo')
+		
+		- You can use also numbers for permissions 
+			$ chmod 777 file		This means rwx-rwx-rwx (for all)
+			$ chmod 550 my-script
+				- The script will be readable/executable for the user and its group only
+		- You can perform the operation recursively on a folder to affect all of its contents 
+			$ chmod -R 777 ./project-dir
+			
+- Defining Default Permissions :
+	[umask Command] :
+		$ umask 
+		$ umask <mask value>
+			- This command sets the default permissions for all newly created file and folders
+		Examples :
+			$ umask			(show the current used umask)
+			$ umask 000		(Sets the mask for new file permissions)
+			
+		Note :
+			A mask of 000 means files are defaulted to permissions of 777 , since the mask is one for reset bits
+			
+Specail Permissions :
+	setuid /setgid Permissions 's' :
+		- When a user executes a program / script , it executes it using its own privileges 
+		- For example , if the user does not have the privilege to write into specific file then the script will fail to do 
+		- Sometimes , we need to run a script that require to do more than what we are privileged to do , in this case we can
+		  assign this script as 's' permission
+		- The 's' permission can be assigned to either the user or group 
+			$ chomd u+s file1
+			$ chomd g+s file2
+		- This permission causes the script to execute with privileges of its 
+			- Owner (is 's' assigned to the user)
+			- Owning group (is 's' is assigned to the group)
+			and not with the privileges of the user running it (as normal scripts would do) 
+		- For Example , if the script is owned by 'root' , and it is assigned 
+			$ chmod u+s file1
+			Then this script will run with root privileges no matter which user is running it 
+	
+	Sticky bit permission 't' :
+		- The Sticky bit can be very useful in shared directories
+		- When a directory has its sticky bit set , then only file owner (or root ) can rename or delete any its content 
+		- in case of the sticky bit not set , any user with write access can do this 
+		- This way , in the shared directory , You can give access of the directory to differnt users , so they can add files,
+		  but limit the deletion / renaming to file owners or root 
+		  	$ chmod +t dir1
+		  	
+		  	
+Changing The owner of a file :
+	[chown Command]
+		$ sudo chown <user>:<group> <file>
+			- This command change the owner of the file to a different user/group
+			Note that this command will need to have root access
+		- Examples :
+			$ sudo chown tom file-1			(make the file owned by the user tom)
+			$ sudo chown -R tom dir-1		(recursive)
+			$ sudo chown tom:project-group file-1
+			$ sudo chown :project-group file-1
+			$ sudo chown tom: file-1		(group is the login group of the user)
+			
+Changing the owning Group 
+[chgrp Command]
+	$ sudo chgrp <group> <file/dir>
+		- This command will change the owning group of the file/dir
+	- Example :
+		$ sudo chgrp my-group file.txt
+		$ sudo chgrp -R my-group ./my-dir
+
+Adding Users :
+[useradd Command] 
+	$ useradd <options> <user-name>
+		- This  command adds a user to the linux Ststem 
+	- Examples :
+		- To Add a user "tom"
+			$ sudo useradd tom
+		- To Add a user "tom" and create the home directory for him :
+			$ sudo useradd -m tom 
+		- To list defaults for user additions :
+			$ sudo useradd -D
+		- To change defaults for user additions :
+			$ sudo useradd -D <options>
+			
+Setting User Password :
+	[passwd Command]
+	$ passwd 
+	$ sudo passwd <username>
+		- This command is used to set the password of the current user , or of a different user 
+	- Examples :
+		After adding the user "tom" , you will need to setup his password 
+		$ sudo passwd tom 
+			Then you will need to enter the password for "tom" twice
+		- if you need to change your own password :
+			$ passwd
+			
+			
+- Identifying Users :
+	[finger , id ,who , whoami Commands] 
+		
+		$ id 
+			- Display uid , gid for current user 
+		$ who 
+			- Lists users logged in the system
+		$ whoami 
+			- Displays current user name
+		$ finger 
+			- info about all users currently logged in 
+		$ finger username
+			- info about username
+
+- Deleting Users :
+	[userdel Command]
+		- To delete a user 
+		$ sudo userdel username
+
+- Adding and Deleting Groups
+[groupadd & groupdel Commands]
+	- To add a group 
+		$ sudo groupadd groupname
+	- To delete a group :
+		$ sudo groupdel groupname
+
+	- To add a user to a group 
+		$ sudo useradd -G <group name> <username>
+	- To modify the list of groups for a user
+		$ sudo usermod -G <list of group names> <username>
+
+Displaying Groups [groups Command]
+	$ groups
+	$ groups username
+	
+Adding Users and Groups Configuration Files :
+	- Users are added in /etc/passwd
+	- Groups are added in /etc/group
+	- Passwords of users are encrypted and stored in /etc/shadow
+ 
+/etc/passwd :
+	- This file Contains a list of users of the system
+	- for each user , a line show the user attributes 
+	
+	- Note : 
+		- if password is null string , no password needed
+		- if password is 'x' or '*' , it is encrypted in /etc/shadow
+/etc/group 
+	- this file contains a list of all groups in the system
+	- Each line represents a group along with its attribute
+	
+
+/etc/shadow 
+	- This file contains a list of users 
+	- Each line contains a user along with its attributes , attributest are separated by colons :
+		- user login id 
+		- Encrypted password (except of ! of & or empty)
+		- Date of last password change 
+		- mini password age 
+		- Max password age
+		- Password Warning period
+		- Password inactivity period
+
+Switching Users :
+	[su Command]
+		$ su <Username>
+			This command allows the user to switch to login as a different user 
+		- Examples :
+			$ su <username> 	(switch to username and keep my environment)
+			$ su - <username> 	(switch to username and load his environment)
+			$ su 			(switch to the root , this is not acceptable in ubuntu)
+		- in all of above cases , the user will be prompted for a password for the new user , if a password is set for him 
+		- to execute command as root ( The only option in ubuntu ) , we can use the command sudo ;
+			$ sudo < commmand >
+				- For this to succeed , the username will need to be configured in the configuration file /etc/sudoers
+				
+				
+Training :
+	$ whoami 
+	$ id 
+	$ who
+	$ chomd o+w ./dir-1
+	$ chmod o-w ./dir-1
+	$ chmod 775 ./dir-1
+	$ chmod 000 ./dir-1
+	$ chmod u+r ./dir-1
+	$ chmod u+x ./dir-1
+	$ sudo chown root file-5
+	$ cat /etc/passwd 
+	$ cat /etc/group
+	$ sudo cat /etc/shadow
+	$ sudo useradd -m tom
+	$ ls /home/
+	$ cat /etc/passwd
+	$ sudo passwd tom
+	$ su tom
+	$ whoami
+	$ exit 
+	$ whoami
+
+
+

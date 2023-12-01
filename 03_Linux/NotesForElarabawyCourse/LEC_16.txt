@@ -1,0 +1,234 @@
+LEC16 : Processs Management Part 2
+
+Process Types :
+	- Automatic (Batch) Process
+		- Also called a batch process
+		- This is process that not started directly by the user , instead , the user schedule it for a later start 
+		- when started , it is not started inside a terminal , and not attached to a terminal (user does not even needs to be
+		  logged in when it starts)
+		- it is queued in a spooler area , to be executed on a FIFO manner 
+			- Scheduled to run at a certain date and time (using the 'at' command)
+			- Scheduled to run when system load is low (using the 'batch' command)
+			- Scheduled to run periodically with certain periodicity or interval 
+
+Scheduling Automatic Tasks :
+	[at Command]
+		$ at [options] <time> < <script file> 
+		$ at -f <script file> <time>
+		
+		- Schedules jobs described in the file to run at the specified time 
+		- Examples :
+			$ at 01:35 < job-to-run
+			$ at 9am February 2 < job-to-run
+			$ at tuesday +2 hours < job-to-run
+			$ at -f job-to-run noon 
+			
+			$ at -l		- List scheduled Jobs
+			$ atq		- List scheduled Jobs
+			$ at -r 3	- Delete scheduled job #3
+			$ atrm 3	- Delete scheduled job #3
+
+Run at Low load times :
+	[batch Command]
+		$ batch < <file containing Jobs>
+			-Run the script whenever the system load allows 
+		- Examples :
+			$ batch < job-to-run
+		
+Cron Jobs :
+	- Cron Jobs are those which are scheduled to run periodically (the word cron comes from Greek word for time)
+	- Job are organized in commands or shell scripts 
+	- They are scheduled by the user to run at :
+		- Fixed times 
+		- Fixed dates 
+		- Intervals 
+	- Used often to automate repeated tasks (such as maintenance or administartion tasks)
+	- Cron Jobs are organized in a set of configuration files that specify the Job to be run , and the required periodicity 
+	- Types of crontab files 
+		- User crontab files (per user file)
+		- System crontab files	(fer root user)
+		- other special files (will be discussed later)
+
+Crontab files Format :
+	- the crontab files have the following format :
+		- it contain a line per scheduled job :
+			- Each line has three sections :
+				- Time schedule section :
+					- This section describes when this job is to be executed 
+				- User Section :
+					- This Section Only applicable for some crontab files 
+				- Job Description Section :
+					- Command to execute
+	Time Schduler : * * * * * --> minute,hour,day_of_month,month,day of week
+	
+	Example :
+		# Execute backup.sh script every sunday at 2:50 AM
+			50 2 * * 0 root /usr/local/sbin/backup.sh 
+	
+	More Schedule :
+		30 0  1  1,6,12 *		at 12.30 AM On first of jan , june , Dec
+		0 20 * 10 1-5 			at 8:00 PM on Every (Mon-Fri) in Oct
+		0 0 1,10,15 * *  		at Midnight on 1,10,15 On Every Month
+		5,10 0 10 * 1			at 12:05 and 12:10 AM on Every monday and 10th of every Month
+		30 18 * * *			at 6:30 PM Every day
+		*/5 * * * *	   		Every 5 Minutes
+		01,31 04,05 1-15 1,6		at 4:01 , 4:31 , 5:01 , 5:31 on the first 15 days of Jan and June
+	Special Strings :
+		@ reboot	Run once at Startup 
+		@ yearly	Run onne a year "0 0 1 1 *"
+		@ annually	same as @ yearly
+		@ monthly    	Run once a month "0 0 1 * *"
+		@ weekly 	Run once a week	 "0 0 * * 0"
+		@ daily 	Run once a day 	 "0 0 * * *"
+		@ midnight	same as @daily
+		@ hourly	Run once an hour "0 * * * * "
+	
+Managing crontab files :
+	Crontab Command :
+		- You should not edit the crontab file manually 
+		- Instead use the crontab command , it performs checking for errors on the file before saving it 
+		- Examples :
+			- to edit your user specific crontab file
+				$ crontab -e
+			- to display your crontab file
+				$ crontab -l
+			- to remove crontab file
+				$ crontab -r
+		- Note :
+			- Applying the same commands with sudo performs the same on the system wide crontab file
+Special crontab files :
+	- so far we talked about :
+		- per user crontab file
+		- system crontab file (for root user)
+	- Both of these categories of files are stored at :
+		/var/spool/cron/crontabs
+	- There are other crontab file setup by the system and packages installed on the distribution :
+		- the file /etc/crontab
+		- crontab files inside /etc/cron.d
+	- it is not recommanded to edit any of those files 
+
+/etc/crontab :
+	- this is used by the system 
+	- not recommended to edit , since system updates will over-write any edits
+	- it calls scripts inside the directories 
+		- /etc/cron.monthly
+		- /etc/cron.weekly
+		- /etc/cron.daily
+	- Used mainly for system admin tasks
+	
+/etc/cron.d :
+	- The /etc/cron.d directory will contain crontab file installed by the different packages in the system
+	- Each package will have its own crontab file for periodic tasks required for this applications
+	- Typical periodic tasks :
+		- Checking the web for updates 
+		- Archiving or Emptying log files 
+		- Deleting temp files 
+		- Checking the inbox for new messages 
+		
+Cron Job Restrictions :
+	- Sometimes there are restriction on which users are allowed to run cron jobs 
+	- The restrictions are defined by the files :
+		/etc/cron.allow
+		/etc/cron.deny
+	- Those files will have list of users that are allowed/denied to/from use of cron jobs 
+	- if both files don't exists , then it is up to the distribution to define the behavior :
+		- Some would open the permission for all users 
+		- Some Would limit the permission for the root user 
+		
+Cron Jobs Output :	
+	- Since the Cron Jobs don't run inside the terminal , output does not show on screen 
+	- progress and Error messages for execution of cron jobs are set to /var/log/syslog
+	- By default , the output of the commands go to the user as an email using the command email (assuming user email has 
+	  been setup in the system)
+	- if you don't want to setup the email , you can do the following :
+		- Redirect the output to a file to be able to follow the progress 
+		- Redirect the output to /dev/null if you want to mute it 
+		
+-------------------------------------
+Daemon Process :
+	- A Daemon process is a process that runs continuously in the background to perfrom a task , or waiting for services to be 
+	  requested from it 
+	- Linux use numerous daemons (normally start them at system startup) to perfrom things like :
+		- Accommodate requests for services from other computers on a network 
+		- Respond to other programs 
+		- Respond to hardware activity
+	- A tradition is to have the daemon name ends with letter 'd' such as (syslogd , xinetd ,ftpd)
+	- Daemons keep listening until they are triggered to do some action , some of the trigger would be :
+		- A Specific time or date (such as atd which handles Jobs scheduled by the at command)
+		- Passage of a specified time interval (such as crond which hanles cron jobs)
+		- a file landing in a particular directory
+		- Receipt of an e-mail or a Web request made through a particular communication means
+		- Connection request from a different computer (such as ftpd which handles FTP requests)
+	
+		
+	- since a Daemon process needs to keep running in the background 
+		- it can not be attached with a terminal (otherwise , it will close with the terminal closure)
+		- Accordingly , at its start , it disassociate itself from its controlling terminal
+	- A Daemon process often need to have its parent as the init process (PPID = 1)
+		- This is achieved for daemons started at system startup , since they will be launched by init
+		- Daemons starting afterwards can have their parent set to the init process , by launching the daemon process ,
+		  then killing its parent . This will cause the kernel to re-parent the process to the init process
+		  
+Creation of a Daemon :
+	- When Daemons are created , the following happens :
+		- The parent of the Daemon is killed (or dies on its own) , to make sure the Daemon is re-parented to the init process
+		- The Daemon is detached from his controlling terminal to make sure it remains up even when it closes
+		- The Daemon becomes a sessions leader (its SID is set to be equel to its PID)
+		- The Dameon becomes a process group leader (its PGID is set to be equel to its PID)
+		- sets its current Directory to be the root directory (/) to allow other any file system to unmoun
+		- Close any relation that it inherited from its parent process
+		- Sets its stdin , stdout and stderr to either a logfile , the console , or mute it by using /dev/null
+		
+Managing Daemons :
+	- Since Daemons are detached from their controlling terminal , then we can not manage them from there
+	- instead , there are scripts (called init scripts) to 
+		- check a daemon status
+		- start a daemon 
+		- stop a daemon 
+		- restart a daemon
+	- Scripts are located in /etc/init.d
+	- For Example :
+		$ sudo /etc/init.d/bluetooth stop 
+		$ sudo /etc/init.d/bluetooth start
+		$ sudo /etc/init.d/bluetooth restart
+		$ sudo /etc/init.d/bluetooth status
+	- in other systems :
+		$ sudo restart bluetooth
+		$ sudo stop bluetooth
+		$ sudo start bluetooth
+		$ sudo status bluetooth
+		
+Examples of Daemons :
+	syslogd			it implements the system logging facility
+	sshd			it services incoming SSH connections 
+	ftpd			it services incoming FTP connections
+	crond			it executes jobs in crontab files
+	atd			it executes jobs scheduled with at command
+	inetd or xinetd		it is responsible for networking 
+	httpd			it is responsible for handling HTTP requests 
+	
+Training :
+	$ at 22:59 < ./my-script
+	$ atq
+	$ at -r 5
+	$ atq
+	$ at 12:00 tuesday < my-script
+	$ at -r 6
+	$ atq
+	$ vi /etc/contab
+	$ ls /etc/cron.daily/
+	$ ls /var/spool/cron/crontabs
+	$ crontab -e
+	23 * 3 5 * /home/guirguis/my-script
+	$ ls /var/spool/cron/crontabs
+	$ crontab -r
+	$ pstree -p > process-tree
+	
+	
+	
+	
+	
+	
+	
+	
+	

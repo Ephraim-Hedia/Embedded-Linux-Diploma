@@ -1,0 +1,220 @@
+LEC 11 : Environment Variables 
+
+What are Environment Variables ?
+	- Environment Variables are variables that store information about the system 
+	- they can be used to store data , set configuration options and customize the shell environment under Linux 
+	- can be divided into : 
+		- System Environment Variables :
+			- Standard Names 
+			- Used by the Shell
+			- Normally thay are All Caps with '_' as seperator
+			- More can be added by the users for their usage
+		- Local Variables :
+			- User Selected names 
+			- Local to a shell (not passed to childern shells or programs)
+			- Convention is to avoid all caps differentiate them 
+			
+Environment Variable Usages :
+	- Example of use of Environment Variable (not a full List) :
+		- Configure look and feel of shell such as colors and bash prompt 
+		- Time zone , host name  , ...
+		- Search path for executales , or any types of files 
+		- Default values for some system configurations 
+		- some configuration options for specific programs
+
+Process Environment :
+	- Always keep in mind that Linux does not maintain or store a global set of environment variable for the system
+	- Each Running program (process) will have its own environment settings 
+	- This means different processes may have different environment settings
+	- The environment settings for each running process in the system can be listed by viewing the file /proc/<pid>/environ
+		- where pid is the process ID (will be discusseed in a future Lecture)
+	- Keep in mind that the shell is a process , and hence it has its own environment settings as well
+
+So How does Processes receive their Environment settings ?
+	- By inheritance
+		- Each process will have a parent process that started it 
+		- The Child process inherits the environment settings of its parent process 
+		- keep in mind that each program (process) that is started inside the shell , is a child of that shell 
+		  hence processes started from the shell , inherit the shell environment settings
+		- Also Keep in mind that , a non-login shell is a child of a login shell , hence it inherits its environment settings 
+  		  at startup
+  		- Note that Local Variables are not inherited to child shells or processes
+ 	- By startup Scripts 
+ 		- some programs source some scipts at startup
+ 		- These scripts may include some environment settings that is added to the process settings inherited from its parent
+ 		- We have already discussed this for Login/non-login shell startup :
+ 			- Login Shells : 	
+ 				/etc/profile
+ 				(~/.bash-profile) or (~/.bash-login) or (~/.profile )
+ 			- Non-Login Shells
+ 				/etc/.bashrc or /etc/bash.bashrc
+ 				~/.bashrc
+ 			- GUI Applications (applications started from the GUI)
+  				~/.xinitrc
+  						
+		 - /etc/profile
+		 	- to add settings that will apply to all shells , and the users .... we need to put it in /etc/profile
+		 	- in most distributions , it is preferred not to edit /etc/profile directly
+		 	- to enable that , /etc/profile has a llop that sources all scripts with extentions *.sh in the folder /etc/
+		 	  profile.d
+		 	- Accordingly , all we need to do is to put our settings in a new script file inside this folder and call it 
+		 	  something.sh 
+		 	  then 
+		  	  make it executable
+  	
+  	- By Passing them as Arguments at start 
+  		- if you want to run a program with some environment variables settings 
+  			$ env VAR=VALUE Command
+  			$ VAR=VALUE Command
+  		- Examples :
+  			$ env EDITOR=vim xterm
+  			$ EDITOR=vim PATH=$PATH:~/projects myScript.sh
+  	
+  	- By Adding them Manually
+  		- if you want to add a local variable in the shell 
+  			$ VARIABLE = VALUE
+  		- if you want to add an Environment variable in the shell 
+  			$ export VARIABLE=VALUE
+  		- Note that the value can be surrounded by quotes
+  			- Optional in general
+  			- Mandatory if it contain spaces
+  		- Examples :
+  			$ Source_Dir="/usr/share" 			(Local and "" optional)
+  			$ export EDITOR=vim
+  			$ export Project_Dir="~/my project/docs"	(Not Local and "" is mandatory)
+ More About export :
+ 	- To set a local Variable in the shell
+ 		$ My_Var=5
+ 		- This way My_Var will not be inherited to any child or process of the current shell
+ 	- To Convert it into Environment Variable 
+ 		$ export My_Var
+ 		This Way Mr_Var will be inherited to any child shell or process of current shell
+ 	- To Bring it back to be just a local Variable 
+ 		$ export -n My_Var
+ 	- To reset an Environment Variable
+ 		$ export My_Var=
+ 	- To Completely remove the variable
+ 		$unset My-Var
+ 		
+Using Environment Variables 
+	- [echo Command]
+		- Now to access the value of a variable :
+			$ echo $VAR_NAME 		
+			$ echo ${VAR_NAME}
+		- Note that we can do the following :
+			$ PATH=$PATH:$HOME/projects
+			$ PATH=${PATH}:${HOME}/projects
+		- Sometimes the {} is optional , and sometimes it is mandatory :
+			$ echo $HOME_and_$USER			(Wrong)
+			$ echo ${HOME}_and_${USER}		(The Right Form)
+	
+	- [printf Command]
+		- The printf Command is just like echo command but uses a differnet format
+			$ printf "$VARIABLE_NAME\n"
+			$ printf "String %s" $VARIABLE_NAME 		
+			$ printf "Signed Decimal Number %d" $VARIABLE_NAME 
+			$ printf "Floating Point Number %f" $VARIABLE_NAME 
+		- Examples :
+			$ printf "$PATH\n"
+			$ printf "The path is set to %s\n" $PATH
+			$ printf "The File count is %d\n" $FILE_COUNT
+			
+Listing Environment Variables :
+	- [the set Command]
+		$ set
+			- The set command lists all variables (both local and environment vars) seen by the shell
+	-[the printenv Command]
+		$ printenv 
+		$ env
+			- Print a List of all Environment Variable (Not including Local Variable)	
+		$ printenv <variable>
+			- Note that we put the variable without the dollar sign
+		Examples :
+			$ printenv PATH
+			$ printenv
+
+Commonly used Environment Variable  :
+	- PATH
+		- it is a list of directories seperated by a colon ':'
+		- This list represent the search path for commands and binaries , when you issue a command 
+			- Issue the command with the binary full path
+			- Issue the command with the name of the binary , and leave Linux search for it based on the $PATH
+		- the which command performs the same search to find the path for the binary without executing it
+		- to show the current search path 
+			$ echo $PATH
+		- to add a folder to the end of the path 
+			$ export PATH=$PATH:/usr/bin
+		- to add a folder to the beginning of the path 
+			$ export PATH=/bin:${PATH}
+		- NOTE :
+			- it is recommended not to add the current directory "./" to the path
+	- PS1
+		- Responsible for setting the shell prompt
+			- \u	username 
+			- \h	hostname
+			- \W	Current working directory
+		- for more options refer to Linux Documentations
+		- Example :
+			$ export PS1 =[\u@\h\W]\$
+	- Dispaly
+		- The $DISPLAY is responsible for the x display name
+			- This means it is not set if you running from a virtual terminal (not on X server)
+		- it is composed of 3 numbers
+			HOST:DISPLAY_NUMBER.SCREEN_NUMBER
+		- The Host field is left empty if we are dealing with the local machine , otherwise , it displays the hostname
+		  or address of the machine running the x-server
+		- Display Number is 0 for the default display (the x-server running on tty7), for other x-server instances running 
+		  on other virtual terminals , it will take numbers 1,2,3,...
+		- The Screen Number is default to 0 , and sometimes it is omitted if it is not different , A display may have multiple 
+		  screens 
+		- Examples :
+		  localhost:4
+		  google.com:0
+		  :0.0
+	- SHELL
+		- Contains the path to the login shell 
+		Example :
+			$ echo $SHELL 	(/bin/bash)  
+	- EDITOR
+	- TERM
+		- Represent the kind of the used terminal 
+		- Examples :
+			- in case of running inside an emulated terminal
+				$ echo  $TERM
+				xterm
+			- in case of running inside a Linux Virtual Terminal
+				$ echo $TERM
+				linux
+	- HOME
+		- The home directory of the current user
+		- Example 
+			$ echo $HOME
+			/home/tom
+	- HISTFILE , HISTFILESIZE , HISTSIZE
+		- the $HISTFILE carries the name of the file in which command history is saved 
+		- the $HISTFILESIZE carries the maximum number of lines contained in the history file
+		- the $HISTSIZE carries the number of commands to remember in the command history . the Default value is 500
+	- HOSTNAME
+		- the name of your machine
+		
+Training :
+	$ ls /proc 
+	$ sudo vi /proc/1103/environ
+	$ ps
+	$ sudo vi /proc/6372/environ
+	$ local_var=5
+	$ export exported_var=10
+	$ echo $local_var
+	$ echo $exported_var
+	$ bash 
+	$ echo $local_var	(not exist)
+	$ echo $exported_var	(will print)
+  	$ exit
+  	$ set 
+  	$ env
+  	$ printenv 
+  	$ echo $PATH
+  	$ export PATH=$PATH:$HOME/lec-5
+  	$ echo $PATH
+  	$ echo $PS1
+  

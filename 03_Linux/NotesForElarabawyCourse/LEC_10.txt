@@ -1,0 +1,223 @@
+LEC10.txt : Learning About the Shell
+
+What is the Shell ? 
+	- The Shell is user space program that accepts text input 
+	- it performs parsing and some expansion of the input
+	- it uses the readline library for text parsing 
+	- it is accessed through terminal or terminal emulator program
+	- it then passes control to appropriate functionality (within the shell or outside it)
+	- a shell will come with some builtin functionality , other functionality will be provided by separate binaries
+	
+Types of Shells ?
+	- First Shell is the "sh" shell , also called the Bourne shell , it is currently obsolete
+	- That waws followed by the "csh" which is C-like shell , this is also currently obsolete
+	- Then there is the tcsh which is still around bout not that popular
+	- the most popular shell (and the one we will be using) is the bash shell . this is part of the GNU project
+	
+	
+	- Supported shells will be listed in the file "/etc/shells"
+	- Default shell for the user will be stated in "/etc/passwd"
+	- To Switch to a different shell , all its binary , for example is you are running with a different shell and want to use base 
+		$ bash
+	- Then you can exit to the original shell by 
+		$ exit
+	- to Know what shell you are using :
+		$ echo $SHELL
+		
+Command Categories :
+	- Command can be one of the following :
+		1- "Built in" command within the shell program (such as : 'cd')
+		2- a binary or executable in the system , that is called by the shell program . 
+		   This Binary should be in the PATH to be accessible (they normally reside in /usr/bin)
+		3- Alias to another command (we will see how to do that)
+		4- A shell function (we will learn more about it in bash Scripting course)
+type Command :
+	$type <command>
+	Example :
+		$ type cd	(cd is a shell builtin) 
+		$ type rm	(rm is /bin/rm)
+		$ type ls	(ls is aliased to "ls --color=auto")
+		
+Builtin Commands :
+	- Those are functionality implemented inside the shell binary 
+	- No separate binary for it 
+	- very limited set , and for very basic commands only
+	- Examples :
+		$ cd
+		$ pwd 
+	- Since they don't have a separate binary , you can not do 
+		$ cd --help 
+	  Instead you can use the shell built in command 
+	  	$help cd
+
+Separate Binary Commands :
+	- This is a separate program that resides in the Linux directory structure
+	- Most commands belong to this category 
+	- Each command will have its own version 
+		$ rm --version 
+	- To get the command usage
+		$ rm --help
+	- To locate the binary for the command 
+		$ which rm
+
+Aliases :
+	- Aliases are an abbreviation of another command (with options/arguments)
+	- To make an alias command 
+		$ alias NewCommand='long command' (Make sure no spaces)
+		Example :
+		$ alias ll='ls -al'
+	- To remove an alias command 
+		$ unalias ll
+	- To list all of aliases
+		$ alias
+	- if the new command is a used command , it will still work (the new command will override the old one)
+		$ alias ls='ls --color=auto'
+	- Make sure you don't fo this by mistake , check the existence of a command with the alias name before you do the aliasing
+		$ type <alias candidate>
+
+Command History :
+	- When you enter a command , Linux stores it in a history file "~/.bash-history"
+	- To browse through command histroy 
+		$ history
+	- Now you can do the following
+		$ !!		(To enter the last command)
+		$ !<n>		(to enter the command#n in the history)
+		$ !abc		(to enter the last command starting with 'abc')
+		$ ^abc ^def	(Enter the last command but replace 'abc' with 'def')
+		$ command2 !*	(run command2 with all arguments from the last command)
+		$ command2 !$ 	(run command2 with only last argument from the last command)
+		
+script command 
+	$ script <file>
+		To Write commands and their output to a file
+	$ script -a file	(append the existing file)
+	$ script -t file	(put time stamp in front of each command)
+	$ script -f file	(flush after each command)
+	
+Shell Types :
+	- Shell belong to categories 
+		- Login shell 
+			- Shells that require login before starting
+		- Non-Login Shell 
+			- Those shells don't require a login 
+			- They are children of login shells
+	- To exit a shell :
+		- for Login shell :
+			$ logout
+		- for non-Login Shells
+			$ exit	
+			
+-------------------------------------------------
+Why Do we call it a shell ?
+
+Shell startup -- Login Shells :
+	When the Login Shell starts up , it goes through these steps to set the proper environment 
+	- System Wide Configuration 
+		- it reads /etc/profile for global configuration (for all users)
+	- User Specific Configuration :
+		- Then it reads one of the following for user specific extensions/overrides 
+		  (if it finds one of the files starting from first , it will read it and skip the rest)
+		  One of These Options :
+			- ~/.bash-profile
+			- ~/.bash-login
+			- ~/.profile
+		- Note that those files normally call ~/.bashrc internally
+
+Shell startup - Non-Login Shells
+	Non-Login Shells build their environment as Follows :
+		- First , They inherit the environment from their parent Login Shells
+		- On top of that , it reads the following configuration files :
+			- for Global settings they read the files :
+				/etc/.bashrc
+				/etc/bash.bashrc
+			- for user specific settings , they read :
+				~/.bashrc
+				
+Updating ~/.bashrc
+	- Each user can put his own setting in ~/.bashrc such as :
+		- Set environment Variables 
+		- Set Command Aliases 
+		- Define Shell Functinos 
+	- The New settings in ~/bashrc will not take effect in the current shell , since it is only read at shell startup
+	- Solution :
+		- start a new shell 
+		- Manually Force ~/.bashrc read
+
+Running The ~/.bashrc script
+[souce command]
+	- Normally , scripts are run by calling them from the prompt
+		$<script name>
+	- we can not just call the script in ~/bashrc line normal script , WHY ??
+		- When a script is run , it runs in a child shell 
+		- When the script completes , the child shell closes and control and control gets back to the original shell
+	- We need a new way to force the script to run in the current shell , and not in a child shell , so setting will apply to 
+	  current shell
+	  	$ source .bashrc
+	  	$ ..bashrc
+
+Usefuls Setting in .bashrc
+	Common setting :
+		- Setting Aliases
+			- a good place to set Aliases is in the ~/.bashrc
+			- Note that these aliases only apply for that user , so if you run as root , you will not have thsese aliases set
+		- Setting Environment Variables for the user
+		- Define Sell Functions
+
+Protecting from File Over-Write
+[Setting noclobber]
+	- Clobber a file means over-writing a file 
+	- This happens very often through output redirection 
+		$ echo "Good Morning" > file.txt
+	- To Avoid that adjust the noclobber setting in ~/.bashrc
+	- Example :
+		$ set -o noclobber	(this will protect files from being over-written)
+		$ set +o noclobber	(this will remove the protection)
+	- Note 
+		- if files are protected from over-writing , you can still force an over-write
+			$ echo "Good Morning" >| file.txt
+	
+===================================================================================================
+$ cat /etc/shells
+$ cat /etc/passwd
+$ echo $SHELL
+$ sh
+$ exit 
+$ type cd 
+$ type type 
+$ type rm 
+$ type ll 
+$ which rm 
+$ echo the program rm is located in `which rm`
+$ 
+$ alias mkdmmy="mkdir dummy"
+$ alias 
+$ cat ~/.bashrc
+$ unalias mkdummy
+$ history
+$ !348
+$ !354
+$ ls -la /etc/profile
+$ cat .bash_history
+$ 
+$ 
+$ 
+$ 
+$ 
+$ 
+$ 
+$ 
+$ 
+$ 
+
+
+
+
+
+
+
+
+
+
+	
+	
+	

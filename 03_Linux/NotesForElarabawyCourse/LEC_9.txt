@@ -1,0 +1,119 @@
+LEC_9 : Input / Output Internals
+	- Each Process in the system comes with 
+		- Output device : defined by its stdout stream 
+		- Input device : defined by its stdin stream 
+		- Error Device : defined by its stderr stream 
+	- We need to understand how does this reflect into messages on the screen , or reading input from the keyboard
+	- We will then needs to understand how does this work with I/O redirection , and the use of Pipes 
+	- To Understand all of that we need to understand the concept of TTY Subsystem in Linux Kernel and how it Operates
+	
+Historical Background :
+	- Stock Ticker
+	- Telex
+	- The Birth of Computers
+	
+TTY Device :
+	TTY Device > UART Driver > Line Discipline > TTY Driver > User App
+	TTY Device (/dev/ttyS*)
+	stdout = /dev/ttyS1
+	stderr = /dev/ttyS1
+	stdin  = /dev/ttyS1
+	Controlling TTY : /dev/ttyS1
+	
+Then Comes the personal Computers 
+
+TTY Devices : 
+	- TTY stands for TeleTYpewirter
+	- TTY Machine were used originally in stock tickers , and Telex Machines
+	- When Computers wew introduced , a computer was a big central unit , TTY machines were used as an I/O terminal , and connect to 
+	  computer via UART (Serial Interface)
+	- In case the terminal is remote , a modem pair were used 
+	- Unix supported all of this via the introduction of TTY subsystem in its kernel 
+	- TTY decive is composed of 3 blocks 
+		- a driver to the hardware interface (UART driver , USB , VGA/KB drivers , ...)
+		- Line Discipline to handle low level editing commands (backspace , erase word , clear line , ...)
+		- TTY driver to interface with the user space application 
+	- The User space application communicates with the TTY driver via system calls and signals 
+	- The default I/O Streams of the User application is the assigned TTY device (/dev/tty*)
+	- this TTY Terminal is also the controlling terminal for its user application
+	
+Virual Terminals :
+	-When we were connecting terminals via the serial interface . we were able to have multiple terminals to the computer 
+	- However , when we connect the monitor and keyboard directly to the PC , and use the same architecture , we can not have 
+	  multiple terminals (Only one monitor /keyboard pair)
+	- We need new architecture that enable us to run multible terminal from the same physical Terminal (Keyboard , Monitor)
+	- This led to the introduction of the concept of Virtual Terminal in Linux 
+	- tty is independing of Hardware
+	-----------------------
+	- A new Architecture is used to be able to have multiple terminals on the same machines (with the same physical terminal)
+	- The Monitor / Keyboard drivers are no longer part of a TTY device , they are now separate devices 
+	- Linux Kernal provides up to 63 virtual terminals (VT) (/dev/tty1 up to /dev/tty63)
+	- Most distribution initialize Only 7 VTs (/dev/tty1 - /dev/tty7)
+	- On each of these VTs , the user app getty is started . This program is responsible for user login 
+	- All VTs are active , but only one have access to the Physical terminal (Monitor / Keyboard)
+	- To Switch between different VTs , use ALT-Fn to fo to the VT#n
+
+Linux GUI :
+	- So far we have talked about Text I/O
+	- We Need to have :
+		- Windowing (Multiple Windows , Maximize , minimize , ... )
+		- Fonts , Colors , Icons 
+		- Handling os mouse actions 
+		- Displaying of Graphics 
+	- For performing all of these tasks , Linux uses X-Window System 
+	- The X-Window system (also Called X System , or X11 System) is a Windowing system for bitmap displays
+	- it is composed of :
+		- Server (X-Server) :
+			- A user application that is responsible for handling the Graphical User Interface and connecting to the drivers
+			- Most Linux distributions use the Xorg application for this
+		- Client (X-Client)
+			- The Client Part Lives in every user application that needs to use the GUI 
+			- The user app connects to the X Server using the X Protocol 
+			
+X-Server and VTs 
+	- as mentioned before , Linux Distribution , initialize some VTs to run getty for user login 
+	  (Most Distribution use /dev/tty1 to /dev/tty6 for that)
+	- The X-Server is started on at least one VT (Normally /dev/tty7).this is X-session #0
+	- Some Distribution start the X-server on multiple VTs (so we get multiple X-sessions)
+	- A User can add more X-sessions or stop X-sessions if needed . 
+          Remember That , the X-Server is just a User application that is started on one of the VTs
+        - Since ALT-Fn has some meaning for the GUI , to move from the GUI to another VT , use Ctrl + Alt + Fn instead
+        - So assuming we have X-server running on /dev/tty7
+        	- To move to VT#1 --> Ctrl Alt F1
+        	- To move back to the GUI --> Alt F7 
+
+Using Emulated Terminals :
+	- The next step is to use an emulated terminal from the GUI 
+	- This means , to have an X-APP that acts as a terminal 
+	- There exists some terminal emulators that run as X-Clients such as :
+		-xterm
+		-Konsole
+		-gnome-terminal
+	- To support this concept , the Linux Kernel introduces the concept of Pseudo Terminals (PTY) (/dev/pts) pseudo terminal slave
+	- pts --> pseudo terminal slave
+	- ptmx --> pseudo terminal master x (Connected with X terminal)
+	- Search about /dev/pts , You will find the Number of Terminal You Open Through GUI
+	- (Mouse , Keyboard) -> (/dev/tty7) -> X server -> XTerminal -> PTY Master -> PTY Slave -> User APP
+	
+Running a shell Command :
+	- (Mouse , Keyboard) -> (/dev/tty7) -> X server -> XTerminal -> PTY Master -> PTY Slave -> shell -> (controlling TTY/PTY) -> 
+          (/dev/pts/1) -> command -> (Default stdin / stdout / stderr)
+Redirecting stdout to file :
+        - (Mouse , Keyboard) -> (/dev/tty7) -> X server -> XTerminal -> PTY Master -> PTY Slave -> shell -> (controlling TTY/PTY) -> 
+          (/dev/pts/1) -> command -> file
+
+screen Command :
+	$ screen -r 
+	- The screen command is an Emulated Terminal Manager
+	- it enable the user to create multiple emulated terminal sessions (Ctrl+A c to create a new session)
+	- it enable the user to move between different sessions (Ctrl+A n to move to next session)
+	- it enable the user to detach the screen command from its controlling TTY (Ctrl+A d )
+	- This is a very useful tool . now the controlling terminal can close without affecting the sessions running under screen
+	- to regain control the screen sessions , perform 
+		$ screen -r
+
+
+
+ 
+	
+	
