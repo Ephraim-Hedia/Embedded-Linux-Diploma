@@ -1,0 +1,195 @@
+LEC 17 : Process Monitoring 
+
+Process Attributes :
+	Process ID 		(PID)
+	Parent Process ID 	(PPID)
+	Process Group ID	(PGID)
+	Session ID		(SID)
+	Terminal Number 	(TTY)
+	User ID 		(RUID & EUID)
+	Group ID		(RGID & EGID)
+	NICE Value		
+	Process state
+	Address Space
+	File Handles
+	stdout/stdin/stderr
+	-------------------------------
+	- Precess id (PID)
+		- A unique indentification number used to refer to the process
+	- Parent Process ID (PPID)
+		- The Process Id of the parent process
+	- Process Group ID 
+		- The ID for the process group that this process belong to 
+		- Will be equal to PID if the process ia a Process Group Leader 
+	- Session ID (SID)
+		- The ID for the session that this process belong to 
+		- the same for the PID if this process is the Session Leader 
+	- Terminal Number 
+		- The number of the terminal that is associated with the process
+		- Only applicable for interactive processes
+		- Batch Processes and Daemons have the value of 0
+	- Owner User ID 
+		- There are two user IDs for the process 
+			- Real User ID (RUID) : the user who started the process
+			- Effective User ID (EUID) : the user whose privileges will be inherited by the process when accessing resources
+			- By default RUID and EUID has the same value 
+	- Owner Group ID 
+		- Similar to user ID , there are two Group IDs :
+			- Real Group ID (RGID) : the primary group of the user who started the process
+			- Effective Group ID (EGID) : The Group ID whose privileges are inherited by the process when accessing system 
+			  resources 
+			- by default RGID and EGID has the same value
+	--------------------------------
+	- Process Priority :
+		- Each Process will have a priority value 
+		- The process priority affects the scheduler behavior in the Linux Kernel 
+		- A process with higher priority may :
+			- Receive more processor time by the kernel 
+			- Get scheduled more often 
+			- Preempt processes with lower processes
+		- Process priority is defined by :
+			- User Controlled value (nice Value)
+			- Kernel calculated value (based on the process behavior)
+				- Process bound 
+				- I/O bound
+	- The 'nice' Value :
+		- This is a value between -19 to 20 assigned by the user 
+		- The kernel uses this value as a factor in calculating the process priority
+		- The higher the 'nice' value of the process , the more it is accommodating other processes (less aggressive) , 
+		  which means lower priority
+		  
+		  
+Set process Priority :
+	[ nice Command ] :
+		$ nice -<value> command
+		$ nice -n <value> command
+			This Command sets the nice value to manipulate the process priority
+		- To incease the priority , nice should be decreased and vice versa
+			- nice value vary between -20 to +19
+			- Default nice value is '0'
+		- Example :
+			- To set nice value 5 for a new process
+				$ nice -5 processCommand &
+				$ nice -n 5 processCommand &
+			- To set nice value -10 for a new process
+				$ nice --10 processCommand &
+				$ nice -n -10 processCommand &
+		- Note : non-root users can only do 1-19 nice values
+		
+		
+Modify Process Priority :
+	[renice Command] :
+		$ renice <value> <pid of process>
+			This command changes the 'nice' value of a process
+		- Example :
+			$ renice 10 1002
+		- Note :
+			- Non-root users can only increase the processes nice value (decrease its priority)
+			- The passed value is the new nice value and not a increament/decrement value
+			
+Display process information & system resource usage :
+	command		Function
+	$ ps		Display Process Static information
+	$ pstree	Display Process Hierarchy
+	$ top		Display Resource usage by processes
+	$ vmsat		Display System Resource Usage
+	$ xload		System Load average (in Graphical fashion)
+	$ tload		System Load average (in Graphical fashion)
+	$ free		Display of Memory Usage (used / free )
+	$ time		Measuring Running time of a command
+	$ uptime	Measuring SYstem Uptime
+------------------
+Display Process info 
+	[ps Command] :
+		$ ps <options>
+			- Display Information about the running Processes
+		- The ps command is a very powerful and diverse command
+		- it has a lot of options to change the ways to display process info :
+			- Some options are used to define the scope of which processes to show
+			- Other options are used to define the format of the listing and which information to show
+			
+		- Defining Scope :
+			$ ps
+				- Display info about processes under the current shell
+			$ ps -e 
+			$ ps -A 
+				- Display all processes in the system
+			$ ps a 
+				- Display all processes in the system except those which are not attached with a terminal
+			$ ps ax 
+				- Display all processes in the system including those which are not attached with a terminal
+	
+		
+		- Definning Format 
+			- You can use different options to define the format of the output (what columns to show)
+			- Some of the common usages 
+				$ ps -f 
+				$ ps -F 
+			- To specify which fields to show use '-o' option 
+				$ ps -o pid,ppid,pgid,sid,command
+				
+		- Showing Threads :
+			- To show threads for multithreaded applications , use one of the following options
+				$ ps -H
+				$ ps -L 
+				$ ps -T 
+				$ ps -m
+		
+		
+Common Practices :
+	- There are hundreds of processes running in the system 
+	- A common pratice , is to do a full listing and pipe the output to a search filter to limit the list to what we are interested in
+		$ ps -ef | grep root
+			- This shows all processes owned by the root user 
+		$ ps aux | grep "pts/2" 
+			- This shows all processes attached to the tty pts/2
+	- There are a lot of options for scope and format . for special need , it is advised to refer to the man page for the command
+		$ man ps
+		
+
+Display Process Resource Usage :
+	[top Command] :
+		$ top 
+			- Displays a dynamic view of the resource usage of system processes
+		- While the 'top' tool is running :
+			- Push 'M' to sort by memory usage
+			- Push 'P' to sort by CPU processing usage
+			- Push 'T' to sort by Time 
+			- Push 'k <pid>' to kill process by its pid
+			- Push 'h' for getting a help page for all options
+			- Push 'H' to enable/disable showing threads separately
+			- Push 'q' to quit the tool
+		
+$ vmstat :
+	- The 'vmstat' Command displays the system resource usage
+$ xload :
+	- This command starts a graphical tool for measurement of system load average
+$ tload :
+	- This command starts a graphical presenetation (using characters) for measurement of system load average
+
+$ free <options> :		
+	This command diplays amount of free and used memory in the system	
+
+
+$ time <command> :
+	- Display elapsed time running a command
+	- This will result in :
+		- Output of the command 
+		- Real time --> total time = user + system + waiting
+		- user time --> User space time
+		- System time --> system time
+$ uptime :
+	- Displays system up-time and load average
+
+
+
+
+
+
+
+
+
+
+
+		
+		

@@ -1,0 +1,204 @@
+LEC 21 : Networking in Linux [Applications]
+
+- Utility Application :
+	- Check Network Connectivity :
+	  [ping command]
+		$ ping <remote machine Address>
+			- This Command is used to check connectivity to the remote machine
+		- When you ping a destination :
+			- a message ICMP_ECHO_REQUEST is sent to this distination
+			- and a reply ICMP_ECHO_REQUEST should be received from the remote destination
+		- This continues every N Second period for a number of times , or until it is interrupted with a Ctrl-C
+		- Ping also can be used if you want to check the round trip delay to the destination
+		- You can specify destination by the IP address or by the Domain name
+		- If you have a network problem , check the following :
+			- ping the gateway to make sure it is accessible 
+			- ping the DNS server
+			- pinf the destination by name and/or by address
+			
+		- Time to Live [TTL] :
+			
+	- Tracing The Route
+	  [traceroute Command]
+	  	$ traceroute <destination Address>
+	  		- Same as ping , but this time , you get the whole route of the packet
+	  			$ traceroute www.google.com
+	  		- Sometimes , certain nodes in the route remain hidden
+	  		
+	- Collecting Network Statistics
+	  [netstat Command]
+	  	$ netstat [Options]
+	  		- This command displays various network related information such as network connections , routing tables ,
+	  		  interfaces statistics ,etc ... 
+	  	- To display the routing table information :
+	  		$ netstat -r
+	  	- To list network interfaces on the machine 
+	  		$ netstat -i 
+	  		$ netstat -ie	(output similar to ifconig)
+	  	- To list statistics on sockets of different protocols 
+	  		$ netstat -s 
+	  		$ netstat -st 	(Only for TCP Protocol)
+	  		$ netstat -su	(Only for UDP Protocol)
+
+- Network Applications :
+	- General Structure
+		- The different network applications described in this lecture share the following structure :
+			- The user access a remote machine for different purposes :
+				- Copy files to/from the remote machine
+				- Access a terminal in the remote machine
+				- Access the GUI of the remote machine
+			- In all cases , the user runs a 'client' application on his 'local machine' 
+			- The 'remote' machine will be running a 'server application'
+			- The Server application will be running on a 'Daemon process' waiting for a connection from the client side
+			- Both the Client and the Daemon are user plane applications that communicate with the TCP/IP stack residing in the 
+			  kernel
+			  
+	- Remote Access of a Machine 
+	  [telnet Protocol]
+	  	$ telnet <destination Address>
+	  		- the telnet is a protocol to enable the user at the client side to access a remote machine by opening a terminal
+	  		  on it 
+	  		  	$ telnet 192.168.101.27
+	  		  	$ telnet bob@192.168.101.27
+	  		- The User will need to enter his login info
+	  		- A server application must be running on the destination machine to accept client connections
+	  		- Once connection is established , a tty terminal will be established on the remote machine that controlled via
+	  		  the 'Telnet session'
+	  		- Anything the user types is sent to the remote machine as if the user is using it
+	  		- After Log-in is complete sucessfully , the user can perform any action that is done on normal terminal
+	  		
+	- Transporting files 
+	  [ftp protocol]
+	  	$ ftp <Remote Machine Address>
+	  		- This protocol enables the client to move files from/to the remote machine
+	  			$ ftp 192.168.101.12
+	  			$ ftp bob@192.168.101.12
+	  		- Sometimes an FTP server can allow anonymous login . in this case use :
+	  			Username:anonymous
+	  			Password:Your Email
+	  		- Once you login , you will be able to get/put files
+	  			$ get myfile.txt
+	  			$ mget *.exe
+	  			$ put my_picture.png
+	  			$ mput *.jpg
+	  		- To exit
+	  			$ bye
+	  			
+	- Security Concern
+		- Both telnet and ftp do not use a secured connection
+		- Information travel between the local machine and the remote one in clear text
+		- This can be a big problem . A hacker can :
+			- Listen to the message being sent
+			- Modify the messages being sent 
+			- Send its own messages with false identity 
+		- Sometimes , this is not a problem 
+			- Connecting to a machine in a secured environment
+			- Connecting to an embedded platform within a isolated network
+			- You don't care about security
+		- Other times , this is not acceptable
+	
+	- Secure login to remote machines 
+	  [ssh protocol] Secure shell
+	  	$ ssh <destination Address>
+	  	- This is similar to the telnet protocol except for that the connection will be secured (traffic will be encrypted)
+	  	- To login securely to a machine :
+	  		$ ssh 192.168.101.100
+	  		$ ssh bob@192.168.101.100
+	  		$ ssh bob@tom-machine
+	  	- in the first time to connect to this machine , some confirmation will be requested to install the required keys for 
+	  	  encryption
+	  	- Once Connection is established , a tty terminal will be established on the remote machine that is controlled via the 
+	  	  SSH session
+	  	  
+	- Secure File Copy 
+	  [scp Command]
+	  	$ scp <local filename> <user>@<remoteServer>:<remote-filename>
+	  	$ scp <user>@<remoteServer>:<remote-filename> <local filename>
+	  	- This Command copies files from/to a remote machine
+	  	- it uses a secure channel similar to that of SSH
+	  	- Usage is similar to the ordinary copy command 'cp' with the exception :
+	  		- Remote filename is proceded by the remote server name , and the optionally the user name
+	  		- a username/password may need to be entered to complete the command
+	  	- The scp performs secure copy :
+	  		$ scp 192.168.101.13:my-doc.pdf ./my-docs/
+	  		$ scp bob@192.168.101.13:my-doc.pdf ./my-docs/
+	  		$ scp ./my-docs/*.pdf bob@remoteServer:.
+	  		$ scp -r ./documents bob@202.11.1.20:.
+	  		
+	  		
+	- Secure file Transfer 
+	  [sftp Command]
+	  	$ sftp <remote Address>
+	  	- This Command has a similar usage as the normal ftp command
+	  	- However , it uses an SSH connection to secure the file transfer
+	  		$ sftp 192.168.1.103
+	  		$ sftp bob@192.168.1.103
+	  	- it has the same interface as ftp
+	  	- Note that sftp does not require an ftp daemon on the remote machine since it uses the ssh connection 
+
+	- Downloading file from the Web
+	  [wget Command]
+	  	$ wget <URL of the file>
+	  	- Very Useful tool for downloading files from the web from the command line
+	  		$ wget http://www.my-web-site.com/file.xml
+	  	- Very useful in scripts that perfom a download from the web
+	  	
+	- Remote Access the Desktop :
+		- The access methods mentioned so far (Telnet and SSH) provide access to a text terminal in the remote machine
+		- However , sometimes we need to have remote access to the remote machine GUI 
+		- We wil need to access the GUI using our mouse and keyboard 
+		- This can be achieved using two ways :
+			- Running the x-server on the local machine , and connecting to x-clients (applications) on the remote machine
+			- Running a VNC Client-Server model
+		
+		- Using X-Server on the Local Machine
+		  [ssh -X Command]
+		  	$ ssh -X <remote machine address>
+		  	- to establish SSH connection , along with X-server running on the local machine , and the X-clients (application)
+		  	  running on the remote machine
+		  	  	$ ssh -X bob@192.168.101.13
+		  	- This tunnels the X-protocol messaging between the X-server and the X-clients in the SSH connection
+		  	
+		  	
+		- Using VNC
+			$ vncserver -geometry 1280x1024
+			- VNC better than SSH server , because the programs will died if the ssh is disconnected
+			
+			
+Training :
+	remote	: ifconfig 					--> to know th ip address (192.168.0.119)
+	local 	: ping 192.168.0.119				--> to check about the connectivity
+	remote 	: sudo /etc/init.d/ssh status 			--> to show the status of the ssh 
+	local 	: ssh osboxes@192.168.0.119
+	local 	: ls 
+	local 	: ifconfig 					--> will show to me the remote ip 192.168.0.119
+	local 	: uname -a
+	remote  : touch abcd
+	local 	: ls 
+	local 	: rm abcd
+	remote 	: ls						--> this to show we access the same machine
+	local 	: scp ./testfFile osboxes@192.168.0.119:.	--> From another terminal
+	local 	: wget wwww.......
+	local 	: vnc4server :2
+	local	: xvncviewer 192.168.0.119:2			--> From another terminal
+	local	: ssh -x osboxes@192.168.0.119			--> From another terminal
+	local	: exit						--> From another terminal
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

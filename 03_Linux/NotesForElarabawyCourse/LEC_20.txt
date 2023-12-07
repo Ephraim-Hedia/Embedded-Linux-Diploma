@@ -1,0 +1,297 @@
+Lecture 20 : Networking in linux (Basic Concepts) 
+
+Why Networking ?
+	- Networking is a very essential tool for linux Users/developer 
+		- Setup our machine to be able to connect to the internet
+		- Identify our machine information (interface / IP Address / ... )
+		- Copy files to/from remote machines 
+		- Copy files to/from the web 
+		- Remotely access a remote machine 
+		- and other important tasks ... 
+	
+	- For an embedded developer , networking is even much more essential 
+	- Embedded Systems normally comes without a display , and we will need to connect to it via a host machine 
+		- we will need to connect to the embedded target for :
+			- Reading the logs 
+			- Debugging the program 
+			- Setting some configuration files 
+			- Uploading a new image
+	
+	So ....
+	- Networking to an embedded user/developer aims for two main purpose :
+		- Connect to a remote machine or to the internet 
+			- This is typically done using an Ethernet connection
+		- Connect a host machine to the embedded target 
+			- This can be achieved via :
+				- JTAG Connection
+				- Serial Console Connection 
+				- Ethernet Connection
+
+Networking Basics :
+	Network Interface :
+		- The computer/Board may have one or more network interface 
+		- in hardware , this is represented by :
+			- An Ethernet NIC card 
+			- WIFI port
+		- In Linux , each interface will have a name :
+			(eth0,eth1,....)
+
+Showing the Network Interfaces:
+[ifconfig Command]
+	$ ifconfig
+	$ ifconfig <interface name>[up/down]
+		- This command is responsible for showing and managing interfaces
+		- To show the interfaces in the system
+			$ ifconfig 
+			$ ifconfig -s	(shows an abstract description)
+		- To show info about a specific interface 
+			$ ifconfig eth1
+		- To activate / deactivate
+			$ ifconfig eth1 up
+			$ ifconfig eth2 down
+			
+	- The MAC Address :
+		- The MAC address is also called the Hardware Address
+		- it is unique address for each NIC card (set by the manufacturer)
+		- it is a 48 bit number written in hexadecimal format (4 bit digits) as follows :
+			68:05:CA:03:19:9C
+		- NOTE :
+			- Hexadecimal format is a format that converts every 4 bits into a single digit
+			- Since 4 bits require 16 combination (takes values from 0 - 15) , the digits (0-9,A,B,C,D,E,F) are used 
+			- Accordingly, since the MAC address is 48 bits , it will be written in 12 hexadecimal digits
+		- Image
+				Manufacturer - Intel	
+				--------
+				00:0C:F1:AC:34:F1
+				 -
+				 Unicast Address , Globally Unique
+		
+- Local Area Network :
+	- A Local Area Network (LAN) is a set of computers connected together via hub/switch 
+	- The devices (computers) are located in the same area (locally located)
+	- The Computers have the same type of network interface (Ethernet , WIFI , ...)
+	- Data is transferred between the machines based on Their MAC addresses
+	
+- A Real Network :
+	- in a more realistic network , not all computer reside in the same LAN : (Why ??)
+		- Limitation on distance between the devices 
+		- Different kind of requirement (Wired / wireless / ...)
+		- Need to isolated devices in groups 
+		- Others ...
+	- Hence A typical network is composed of a group of LANs interconnected with each other with some routing devices 
+	- Within each LAN , MAC address is used for communication inside this LAN
+	- However , the MAC Address in no longer enough to communicate between the devices in different LANs , and we need a more 
+	  global addressing scheme
+	  - This is called network addressing which uses the IP Address
+	  
+- IP Address :
+	- Any network interface on a machine in the network is identified by its IP Address
+		- Sometimes the interface may have multiple IP-Addresses
+	- The IP address is composed of 4 numbers (0-255) Separated by a dot 
+		- Example : 192.168.101.112
+		- This assuming , we are using IPv4 , another version which is IPv6 has a different format 
+		- Note that the number 0-255 is an 8-bit number
+		
+- Is IP Address Enough ??
+	- Port Numbers identify different services within the same IP address
+	- Each connection will have both source port and destination port numbers
+- Port Numbers (16 Bits):
+	Port Number (0 ~ 65,535)
+	(0~1024)	Well-Known
+	(1024~49152)	Registered
+	(49152~65535)	Dynamic Private
+	21		FTP
+	22		SSH
+	23		Telnet
+	25		SMTP
+	53		DNS
+	80		HTTP
+	110		POP3
+	143		IMAP
+
+- Subnet :
+	- To Facilitate Routing :
+		- The machines are organized into small networks (subnets)
+		- Subnets share the upper part of the IP address
+	- Network interface within the same subnet share the upper part of the IP address , and differ in the lower part 
+	- The number of bits shared within the subnet control the subnet size 
+	- For example if we have the upper 24 bits (3 bytes) shared within the subnet , then the interfaces with the subnet can differ
+	  in 8 bits only , which leads to a maximum of 256 addresses
+	- if the shared part is reduced to 20 bits only , we will have 12 bits to change which lead to 4096 different addresses
+	- the part of the IP Address shared among the interfaces within the subnet , is expressed as the subnet mask
+	
+- Subnet mask :	
+			  192.168.101.112
+	Subnet Address 	: 192.168.101.0
+	Subnet Mask 	: 255.255.255.0
+	Address 	: 192.168.101.112/24
+	
+	Example :
+				  192.168.101.112
+		Subnet Address 	: 192.168.96.0
+		Subnet Mask 	: 255.255.240.0
+		Address		: 192.168.101.112/19
+--------------------------
+Show Subnet Mask 
+[ifconfig Command]
+	$ ifconfig
+	
+IP Address ALlocation :
+	- IP Address can be allocated in two different ways :
+		- Statically allocated 
+			- This is done manually , or via a startup script
+			- Address ia always the same 
+		- Dynamically allocated via a DHCP server
+			- at startup , the machine asks a DHCP server to provide it with an IP Address
+			- The DHCP server responds with an unused IP address within the proper subnet 
+			- Hence , the IP address can changes every time the machine boots 
+			- The DHCP server can be configured so it will always assign a specific machine the same IP Address
+		- Using DHCP address allocation is more convenient and more flexible
+		- Since the DHCP server needs to be accessed before the IP address is allocated , it should reside within the same 
+		  LAN as the machines (it is typically located inside the LAN switch)
+
+
+Allocating IP Address
+[ifconfig Command]
+	$ ifconfig <interface> <IP Address>
+	$ ifconfig <interface> <IP Address> netmask <netmask>
+	$ ifconfig <interface> netmask <netmask>
+		- Used to statically allocate IP Address to an interface and/or set its net-mask
+	-Example :
+		$ ifconfig eth1 192.268.0.10
+		$ ifconfig eth1 netmask 255.255.255.224
+		$ ifconfig eth1 192.268.0.10 netmask 255.255.255.224
+
+- Special IP Addresses :
+	- Some IP Addresses have a special meaning :
+		- The Address 127.0.0.1 is reserved for the Local Host , This means it is used as a loop back address
+		- Any Address ending with all ones (after the subnet mask) , is a broadcast address within this subnet
+			- Example :
+				in the subnet 192.168.224.0/19 the broadcast address whould be 192.168.255.255
+		- Any address of the format xxx.xxx.xxx.xx1 is reserved for the default gateway 
+		- The following subnets are reserved for private addressing (to be discussed later) 
+		Subnet 			Starting from 			Ending at
+		10.0.0.0/8		10.0.0.0			10.255.255.255
+		172.16.0.0/12		172.16.0.0			172.31.255.255
+		192.168.0.0		192.168.0.0			192.168.255.255
+		
+		
+- How is Routing Done ?
+	- First the destination address is checked to be within the same subnet of the sender or not 
+		- if it is on the same subnet :
+			- Then delivering the packet will need to be done based on the MAC address
+			- This means we will need to know the MAC address of the distination
+			- we will not need this now , since the destination address does not belong to the sender subnet
+		- if it is not on the same subnet :
+			- Then we will need to deliver the packet to the proper next hop 
+			- The next hop is identified based on the Routing Table
+			- The routing table is a table of routes that identifies the next hop based on the packet destination 
+			
+	- Show the Routing Table :
+  	  [route command]
+  		$ route 
+	  		- The route command shows the entries of the routing table 
+	  			$ route 
+	  		- Each route contains :
+	  			- Destination 	: This is an address , whether a host address or a subnet address
+	  			- Network mask 	: Used when a subnet address is used for destination
+	  			- Interface 	: The used interface for this destination
+	  			- Gateway 	: The next hop for this destination
+	  		- Upon the reception of a packet :
+	  			- Linux tests the packet destination address to match the destination of the routes 
+	  			- if a match exists , Linux forwards the packet to the defined interface , towords the specified GW address
+
+			
+			$ route add <address> dev <interface> gw <address>
+			$ route add default gw <address>
+			$ route del <address>
+			$ route del default 
+			
+				- To add a route 
+					$ sudo route add 192.56.76.123 dev eth1 gw 192.168.101.1
+					$ sudo route add -net 192.56.76.0 netmask 255.255.255.0 dev eth0
+					$ sudo route add default gw 192.168.101.1
+				- To delete a route 
+					$ sudo route del default 
+					$ sudo route del 192.168.100.20
+	- Now the router has received the packet 
+	- it should also check its routing table to identify the proper interface to use for forwarding the packet
+	- The destination is found to belong to the subnet 141.14.2.0/24 , and the interface identified
+	- Now we need to deliver the packet to its destination within the subnet 
+	- Since delivering the packet within the subnet is based on the MAC Address , we will need to know the MAC address of the 
+	  destination
+	- What is the MAC Address for the Host 1411.14.2.105 ??
+		- Identifying the MAC Address 
+		  [The ARP Protocol] Address resolution Protocol
+		  	- The machine should have a table that maps IP Addresses to MAC addresses within its subnet 
+		  	- The table is called the ARP table 
+		  	- if the machine does not have the address in its table , it queries it using the 'ARP protocol' (Address 
+		  	  Resolution Protocol)
+		- Manage the ARP Table 
+		  [arp Command]
+		  	$ arp
+		  	$ arp -s <IP Address> <Hardware Address>
+		  	$ arp -d <IP Address>
+		  	
+		  	- The arp Command is responsible for display and management of the ARP table
+		  	- To Display the ARP Table 
+		  		$ arp
+		  	- To 'manually' add an entry to the ARP Table (normally ARP Table entries are filled by the ARP protocol)
+		  		$ sudo arp -s 192.168.101.105 00:0C:F1:AC:34:F1
+		  	- To 'manually' delete an entry to the ARP Table (normally ARP Table entires expire automatically)
+		  		$ sudo arp -d 192.168.101.105
+	- Now the machine knows the MAC Address of the destination , and it can deliver the packet to it
+	
+Internal IP Addressing and NATing : (Networking Address Translation)
+	- Why NATing ??
+		- NAT (Network Address Translation) is used to hide internal network from the rest of the network to :
+			- Reduce the required number of administeted IP Addresses
+			- Product the internal network from access from the external network 
+		- The NAT Router Builds a mapping table between the internal addresses/ports , and its own address/ports 
+		  (or from some list of administered addresses)
+			- The external network sees only the externel addresses
+			- We only need one globally administered IP Address (for the router)
+		- The Following subnet addresses are reserved for the private addresses :
+			Subnet 			Starting from 			Ending at
+			10.0.0.0/8		10.0.0.0			10.255.255.255
+			172.16.0.0/12		172.16.0.0			172.31.255.255
+			192.168.0.0		192.168.0.0			192.168.255.255
+	
+
+- Domain Names :
+	- When accessing a server , it is normally identified by a domain name istead of IP Address :
+		- More readable (www.google.com istead of 134.11.234.102)
+		- Better Portability (we can change the server IP Address)
+		- Enable High Availability (Using a standby server in case of failure)
+		- Enable Load Sharing (Distribution of load among multiple server)
+	- We need a way to convert the domain name into the IP Address
+	- This is acheived through DNS Server
+	- Setting DNS Server info
+	  [/etc/resolv/conf]
+	  	- To set the set of name servers to search for mapping Domain name to IP Address , edit the file /etc/resolc.conf
+	  	- Name servers a re specified as follows :
+	  		nameserver 208.67.222.222
+	  		nameserver 208.67.220.220
+	  	- any changes made to the file will take effect immediatelely
+	  	
+- Machine Hostname Aliases :
+  [/etc/hosts]
+	- The file /etc/hosts contains a list of aliases to hosts
+ 	- Resolving Domain Names 
+ 	  [host command]
+ 	 	$ host <Domain Name>
+ 	 		- This command is used to lookup a domain name and return with its IP Address(es)
+ 	 	- Example :
+ 	 		$ host www.google.com
+ 	 	- Note that the 'dig' command can do a similar job
+
+- Training
+	$ sudo ifconfig eth0 down
+	$ sudo ifconfig eth0 up
+
+
+
+
+
+
+

@@ -1,0 +1,63 @@
+LEC 18 : Process Life Cycle 
+
+Process Creations :
+	- Fork-Exec Procedure 
+		- Create a new process happen in two steps 
+			- Fork :
+				in this step the new process (child process) is created and inherits its freatures from its parent
+			- Execute :
+				in this step the new process (child process) separates from its parent and move on with its functionality
+
+Fork :
+	- The job of "fork" in is to create a new process (child process) and prepare it with what it needs to be able to run ...
+	- This includes :
+		- Assign it a new pid
+		- Create associated Structure in the kernel 
+		- Sets the ppid , pgid , sid , and any other attributes
+		- Add it to the kernel schedular queue to give it time slots to run
+		- Copy parent memory space (all memory associated with the parent process) to the child process memory space
+		- Copy Other parent process resources :
+			- Normal file handleres
+			- Socket handlers
+			- shared memory handlers
+			- ...
+Exec :
+	- The job of "Exec" is to send the child process on its own to do its assigned job 
+	- This means the child process will be loaded with :
+		- New memory space instead of its parent 
+		- will lose access to parent process resources
+		- a pointer to the new program to run 
+	- This command separates the child process from its parent , and the child process runs now on its own ,
+	  using its own memory address space , and running its own executable and creating / reserving its own system resources
+	  
+	  
+Process Vs Thread :
+	- Both processes and threads are threads of execution that enable parallel operation (multi-tasking) with the help of the schedular
+	  in the kernel 
+	- in both cases , the linux kernel assigns time slots for the process/thread to execute before another one is assigned
+	
+	- in Linux a thread is a process with some special differences :
+		- when creating a thread , the address space (and some other resources) are not copied from the parent . 
+		  they are shared with the parent 
+		- this means threads run within the same address space of its parent and never get a new address space
+	- Other than that , threads are treated exactly the same as processes 
+		- for example the kernel scheduler deals with each thread independently
+	- SO , threads created by the same process are multiple processes that share the same address space and resources of their parent
+	  process
+	  
+Process Termination :
+	- A process is terminated by :
+		- Normal termination (reaching the end of its operation)
+		- Receiving a Signal that cause it to terminate itself
+		- Terminated by the kernel
+	- When the process is terminated , some of its resources are not yet released , and it changes its state to the Zombie state
+	- The parent process must be waiting for its childern processes to perform the required cleanup of resources
+	- Once the parent process perfrom the required cleanup , the process is no longer in Zombie
+	- This is why every process must have a living parent , and if its parent process terminates , the child processes are re-parented 
+	  to the init process
+Process Status :
+	- Running 
+	- Stopped
+	- Waiting for some Event
+	- Zombie
+	
